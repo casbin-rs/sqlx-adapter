@@ -1,0 +1,27 @@
+[package]
+name = "sqlx-adapter"
+version = "0.3.0"
+authors = ["Eason Chai <hackerchai.com@gmail.com>"]
+edition = "2018"
+license = "Apache-2.0"
+description = "Sqlx adapter for casbin-rs"
+homepage="https://github.com/casbin-rs/sqlx-adapter"
+readme="README.md"
+
+[dependencies]
+casbin = { version = "0.3.0" }
+sqlx = "0.2"
+async-trait = "0.1.24"
+
+[features]
+default = ["postgres", "runtime-async-std"]
+
+postgres = ["sqlx/postgres"]
+mysql = ["sqlx/mysql"]
+
+runtime-tokio = ["casbin/runtime-tokio"]
+runtime-async-std = ["casbin/runtime-async-std"]
+
+[dev-dependencies]
+async-std = { version = "1.5.0", features = [ "attributes" ] }
+tokio = { version = "0.2.11", features = [ "full" ] }
