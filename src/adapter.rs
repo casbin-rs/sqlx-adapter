@@ -2,14 +2,14 @@ use async_trait::async_trait;
 use casbin::{Adapter, Model, Result};
 use sqlx::{Pool};
 
-use crate::{error::*, models::*};
-
 use std::error::Error as StdError;
 
-#[cfg(feature = "mysql")]
-use crate::databases::mysql as adapter;
-#[cfg(feature = "postgres")]
-use crate::databases::postgresql as adapter;
+use crate::{
+    databases::mysql as adapter,
+    databases::postgresql as adapter，
+    error::*,
+    models::*,
+};
 
 pub struct SqlxAdapter {
     pool: Pool<adapter::Connection>
