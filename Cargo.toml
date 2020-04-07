@@ -9,8 +9,8 @@ homepage="https://github.com/casbin-rs/sqlx-adapter"
 readme="README.md"
 
 [dependencies]
-casbin = { version = "0.3.0" }
-sqlx = {version = "0.2.6", default-features = false, optional=true }
+casbin = { version = "0.4.3" }
+sqlx = {version = "0.3.3"}
 async-trait = "0.1.24"
 serde = { version = "1.0.105", features = [ "derive" ] }
 anyhow = "1.0"

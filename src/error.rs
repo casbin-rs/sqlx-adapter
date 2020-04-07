@@ -26,3 +26,8 @@ impl StdError for Error {
     }
 }
 
+impl From<SqlxError> for Error {
+    fn from(err: SqlxError) -> Self {
+        Error::SqlxError(err)
+    }
+}
