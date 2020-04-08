@@ -1,0 +1,29 @@
+language: rust
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+      - libssl-dev
+services:
+  - postgresql
+cache: cargo
+rust:
+  - stable
+  - nightly
+env:
+  - DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+  - POOL_SIZE=8
+matrix:
+  allow_failures:
+    - rust: nightly
+before_script:
+  - rustup component add rustfmt
+  - psql -c "CREATE DATABASE casbin;" -U postgres
+  - psql -c "CREATE USER casbin_rs WITH PASSWORD 'casbin_rs';" -U postgres
+
+script:
+  - cargo clean
+  - cargo build
+  - cargo test
+  - cargo fmt --all -- --check
