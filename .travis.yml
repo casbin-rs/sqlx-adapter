@@ -12,8 +12,7 @@ rust:
   - stable
   - nightly
 env:
-  - DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-  - POOL_SIZE=8
+  - DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin; POOL_SIZE=8;
 matrix:
   allow_failures:
     - rust: nightly
