@@ -17,7 +17,7 @@ async-std = "1.5.0"
 
 ## Configure
 
-Rename `sample.env` to `env`
+Rename `sample.env` to `.env`
 
 ```
 DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
