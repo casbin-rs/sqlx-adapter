@@ -290,7 +290,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(&mut conn)
         .await
-        .map(|n| n >= 1)
+        .map(|n| n == 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -385,7 +385,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(&mut conn)
         .await
-        .map(|n| n >= 1)
+        .map(|n| n == 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
