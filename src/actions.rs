@@ -137,7 +137,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n >= 1 {
+            if n == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -184,7 +184,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n >= 1 {
+            if n == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
