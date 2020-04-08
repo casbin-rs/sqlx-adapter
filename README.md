@@ -9,7 +9,7 @@ An adapter designed to work with [casbin-rs](https://github.com/casbin/casbin-rs
 
 Add it to `Cargo.toml`
 
-```
+```rust
 casbin = { version = "0.4.3" }
 sqlx-adapter = { version = "0.1.0", features = ["postgres"] }
 async-std = "1.5.0"
@@ -19,7 +19,7 @@ async-std = "1.5.0"
 
 Rename `sample.env` to `.env`
 
-```
+```bash
 DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
 POOL_SIZE=8
 ```
