@@ -10,18 +10,23 @@ pub struct SqlxAdapter {
     pool: Pool<adapter::Connection>,
 }
 
-pub const TABLE_NAME: &str = "casbin_rules";
+//pub const TABLE_NAME: &str = "casbin_rules";
 
 impl<'a> SqlxAdapter {
-    pub fn new() -> Result<Self> {
+    pub async fn new() -> Result<Self> {
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is required");
-        let pool_size: u32 = std::env::var("POOL_SIZE")?.parse().unwrap();
+        let pool_size: u32 = std::env::var("POOL_SIZE")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(32);
+
         let pool = Pool::builder()
             .max_size(pool_size)
             .build(database_url.as_str())
+            .await
             .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-        adapter::new(pool).map(|_| Self { pool })
+        adapter::new(&pool).await.map(|_| Self { pool })
     }
 
     pub(crate) fn save_policy_line(
@@ -105,7 +110,6 @@ impl<'a> SqlxAdapter {
 #[async_trait]
 impl Adapter for SqlxAdapter {
     async fn load_policy(&self, m: &mut dyn Model) -> Result<()> {
-
         let rules = adapter::load_policy(&self.pool).await?;
 
         for casbin_rule in &rules {
@@ -126,7 +130,6 @@ impl Adapter for SqlxAdapter {
     }
 
     async fn save_policy(&mut self, m: &mut dyn Model) -> Result<()> {
-
         let mut rules = vec![];
 
         if let Some(ast_map) = m.get_model().get("p") {
@@ -150,13 +153,11 @@ impl Adapter for SqlxAdapter {
                 rules.extend(new_rules);
             }
         }
-
         adapter::save_policy(&self.pool, rules).await
     }
 
     async fn add_policy(&mut self, _sec: &str, ptype: &str, rule: Vec<String>) -> Result<bool> {
-
-        if let Some(new_rule) = self.save_policy_line(ptype, rule) {
+        if let Some(new_rule) = self.save_policy_line(ptype, rule.as_slice()) {
             return adapter::add_policy(&self.pool, new_rule).await;
         }
 
@@ -169,7 +170,6 @@ impl Adapter for SqlxAdapter {
         ptype: &str,
         rules: Vec<Vec<String>>,
     ) -> Result<bool> {
-
         let new_rules = rules
             .iter()
             .filter_map(|x: &Vec<String>| self.save_policy_line(ptype, x))
@@ -179,7 +179,6 @@ impl Adapter for SqlxAdapter {
     }
 
     async fn remove_policy(&mut self, _sec: &str, pt: &str, rule: Vec<String>) -> Result<bool> {
-
         adapter::remove_policy(&self.pool, pt, rule).await
     }
 
@@ -189,7 +188,6 @@ impl Adapter for SqlxAdapter {
         pt: &str,
         rules: Vec<Vec<String>>,
     ) -> Result<bool> {
-
         adapter::remove_policies(&self.pool, pt, rules).await
     }
 
@@ -201,7 +199,6 @@ impl Adapter for SqlxAdapter {
         field_values: Vec<String>,
     ) -> Result<bool> {
         if field_index <= 5 && !field_values.is_empty() && field_values.len() >= 6 - field_index {
-
             adapter::remove_filtered_policy(&self.pool, pt, field_index, field_values).await
         } else {
             Ok(false)
@@ -226,9 +223,9 @@ mod tests {
             .await
             .unwrap();
 
-        let adapter = SqlxAdapter::new().unwrap();
+        let adapter = SqlxAdapter::new().await.unwrap();
 
-        assert!(Enforcer::new(m, adapter).await.is_ok());
+        Enforcer::new(m, adapter).await.expect("load_policy ok");
     }
 
     #[cfg_attr(feature = "runtime-async-std", async_std::test)]
@@ -243,7 +240,7 @@ mod tests {
             .unwrap();
 
         let mut e = Enforcer::new(m, file_adapter).await.unwrap();
-        let mut adapter = SqlxAdapter::new().unwrap();
+        let mut adapter = SqlxAdapter::new().await.unwrap();
 
         assert!(adapter.save_policy(e.get_mut_model()).await.is_ok());
 
@@ -391,4 +388,3 @@ mod tests {
             .is_ok());
     }
 }
-
