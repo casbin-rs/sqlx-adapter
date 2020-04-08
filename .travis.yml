@@ -20,7 +20,7 @@ before_script:
   - rustup component add rustfmt
   - psql -c "CREATE DATABASE casbin;" -U postgres
   - psql -c "CREATE USER casbin_rs WITH PASSWORD 'casbin_rs';" -U postgres
-  - psql -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+  - psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
     id SERIAL PRIMARY KEY,
     ptype VARCHAR NOT NULL,
     v0 VARCHAR NOT NULL,
@@ -30,7 +30,7 @@ before_script:
     v4 VARCHAR NOT NULL,
     v5 VARCHAR NOT NULL,
     CONSTRAINT unique_key UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
-    );" -U casbin_rs -W casbin_rs -d casbin
+    );"
 
 script:
   - cargo clean
