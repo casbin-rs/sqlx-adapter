@@ -225,7 +225,7 @@ mod tests {
 
         let adapter = SqlxAdapter::new().await.unwrap();
 
-        Enforcer::new(m, adapter).await.expect("load_policy ok");
+        assert!(Enforcer::new(m, adapter).await.is_ok());
     }
 
     #[cfg_attr(feature = "runtime-async-std", async_std::test)]

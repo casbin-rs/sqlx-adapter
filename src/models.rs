@@ -1,11 +1,6 @@
-use sqlx::{FromRow, Row};
+use sqlx::FromRow;
 
-#[cfg(feature = "postgres")]
-pub type DbRow = sqlx::postgres::PgRow;
-#[cfg(feature = "mysql")]
-pub type DbRow = sqlx::mysql::MySqlRow;
-
-#[derive(Debug)]
+#[derive(Debug,FromRow)]
 pub(crate) struct CasbinRule {
     pub id: i32,
     pub ptype: String,
@@ -28,17 +23,4 @@ pub(crate) struct NewCasbinRule<'a> {
     pub v5: &'a str,
 }
 
-impl FromRow<DbRow> for CasbinRule {
-    fn from_row(row: DbRow) -> CasbinRule {
-        Self {
-            id: Row::get(&row, "id"),
-            ptype: Row::get(&row, "ptype"),
-            v0: Row::get(&row, "v0"),
-            v1: Row::get(&row, "v1"),
-            v2: Row::get(&row, "v2"),
-            v3: Row::get(&row, "v3"),
-            v4: Row::get(&row, "v4"),
-            v5: Row::get(&row, "v5"),
-        }
-    }
-}
+
