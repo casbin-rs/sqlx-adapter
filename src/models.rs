@@ -1,6 +1,6 @@
 use sqlx::FromRow;
 
-#[derive(Debug,FromRow)]
+#[derive(Debug, FromRow)]
 pub(crate) struct CasbinRule {
     pub id: i32,
     pub ptype: String,
@@ -22,5 +22,3 @@ pub(crate) struct NewCasbinRule<'a> {
     pub v4: &'a str,
     pub v5: &'a str,
 }
-
-
