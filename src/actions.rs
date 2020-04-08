@@ -1,6 +1,6 @@
 use crate::Error;
 use casbin::{error::AdapterError, Error as CasbinError, Result};
-use sqlx::{pool::Pool, Error as SqlxError};
+use sqlx::{error::Error as SqlxError, pool::Pool};
 
 use crate::models::{CasbinRule, NewCasbinRule};
 
@@ -75,13 +75,7 @@ pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String
     )
     .execute(&mut conn)
     .await
-    .and_then(|n| {
-        if n == 1 {
-            Ok(true)
-        } else {
-            Err(SqlxError::RowNotFound)
-        }
-    })
+    .map(|n| n == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -107,13 +101,7 @@ pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String
     )
     .execute(&mut conn)
     .await
-    .and_then(|n| {
-        if n == 1 {
-            Ok(true)
-        } else {
-            Err(SqlxError::RowNotFound)
-        }
-    })
+    .map(|n| n == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -149,7 +137,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if n >= 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -196,7 +184,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if n >= 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -302,13 +290,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(&mut conn)
         .await
-        .and_then(|n| {
-            if n == 1 {
-                Ok(true)
-            } else {
-                Err(SqlxError::RowNotFound)
-            }
-        })
+        .map(|n| n >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -403,13 +385,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(&mut conn)
         .await
-        .and_then(|n| {
-            if n == 1 {
-                Ok(true)
-            } else {
-                Err(SqlxError::RowNotFound)
-            }
-        })
+        .map(|n| n >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -445,6 +421,13 @@ pub(crate) async fn save_policy<'a>(
     sqlx::query!("DELETE FROM casbin_rules")
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n >= 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
@@ -460,6 +443,13 @@ pub(crate) async fn save_policy<'a>(
         )
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n == 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     }
     transaction
@@ -481,6 +471,13 @@ pub(crate) async fn save_policy<'a>(
     sqlx::query!("DELETE FROM casbin_rules")
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n >= 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
@@ -496,6 +493,13 @@ pub(crate) async fn save_policy<'a>(
         )
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n == 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     }
     transaction
@@ -523,6 +527,7 @@ pub(crate) async fn add_policy<'a>(
     )
     .execute(&mut conn)
     .await
+    .map(|n| n == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
@@ -546,6 +551,7 @@ pub(crate) async fn add_policy<'a>(
     )
     .execute(&mut conn)
     .await
+    .map(|n| n == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
@@ -574,6 +580,13 @@ pub(crate) async fn add_policies<'a>(
         )
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n == 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     }
     transaction
@@ -606,6 +619,13 @@ pub(crate) async fn add_policies<'a>(
         )
         .execute(&mut transaction)
         .await
+        .and_then(|n| {
+            if n == 1 {
+                Ok(true)
+            } else {
+                Err(SqlxError::RowNotFound)
+            }
+        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     }
     transaction

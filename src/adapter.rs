@@ -18,11 +18,11 @@ impl<'a> SqlxAdapter {
         let pool_size: u32 = std::env::var("POOL_SIZE")
             .ok()
             .and_then(|s| s.parse().ok())
-            .unwrap_or(32);
+            .unwrap_or(8);
 
         let pool = Pool::builder()
             .max_size(pool_size)
-            .build(database_url.as_str())
+            .build(&database_url)
             .await
             .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -137,7 +137,7 @@ impl Adapter for SqlxAdapter {
                 let new_rules = ast
                     .get_policy()
                     .into_iter()
-                    .filter_map(|x: &Vec<String>| self.save_policy_line(ptype, x));
+                    .filter_map(|x| self.save_policy_line(ptype, x));
 
                 rules.extend(new_rules);
             }
@@ -148,7 +148,7 @@ impl Adapter for SqlxAdapter {
                 let new_rules = ast
                     .get_policy()
                     .into_iter()
-                    .filter_map(|x: &Vec<String>| self.save_policy_line(ptype, x));
+                    .filter_map(|x| self.save_policy_line(ptype, x));
 
                 rules.extend(new_rules);
             }
@@ -172,7 +172,7 @@ impl Adapter for SqlxAdapter {
     ) -> Result<bool> {
         let new_rules = rules
             .iter()
-            .filter_map(|x: &Vec<String>| self.save_policy_line(ptype, x))
+            .filter_map(|x| self.save_policy_line(ptype, x))
             .collect::<Vec<NewCasbinRule>>();
 
         adapter::add_policies(&self.pool, new_rules).await
@@ -343,7 +343,7 @@ mod tests {
                 to_owned(vec!["alice", "data2_admin", "not_exists"])
             )
             .await
-            .is_ok());
+            .unwrap());
 
         assert!(adapter
             .add_policy("", "g", to_owned(vec!["alice", "data2_admin"]))
