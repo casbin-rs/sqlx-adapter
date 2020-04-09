@@ -23,7 +23,7 @@ pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
                     v3 VARCHAR NOT NULL,
                     v4 VARCHAR NOT NULL,
                     v5 VARCHAR NOT NULL,
-                    CONSTRAINT unique_key UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+                    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
                     );
         "
     )
@@ -45,7 +45,7 @@ pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
                     v4 VARCHAR(128) NOT NULL,
                     v5 VARCHAR(128) NOT NULL,
                     PRIMARY KEY(id),
-                    CONSTRAINT unique_key UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+                    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
     )
     .execute(&mut conn)

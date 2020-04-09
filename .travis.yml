@@ -29,7 +29,7 @@ before_script:
     v3 VARCHAR NOT NULL,
     v4 VARCHAR NOT NULL,
     v5 VARCHAR NOT NULL,
-    CONSTRAINT unique_key UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
     );"
 
 script:
