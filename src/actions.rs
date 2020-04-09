@@ -421,13 +421,6 @@ pub(crate) async fn save_policy<'a>(
     sqlx::query!("DELETE FROM casbin_rules")
         .execute(&mut transaction)
         .await
-        .and_then(|n| {
-            if n >= 1 {
-                Ok(true)
-            } else {
-                Err(SqlxError::RowNotFound)
-            }
-        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
@@ -471,13 +464,6 @@ pub(crate) async fn save_policy<'a>(
     sqlx::query!("DELETE FROM casbin_rules")
         .execute(&mut transaction)
         .await
-        .and_then(|n| {
-            if n >= 1 {
-                Ok(true)
-            } else {
-                Err(SqlxError::RowNotFound)
-            }
-        })
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
