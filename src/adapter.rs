@@ -14,6 +14,8 @@ pub struct SqlxAdapter {
 
 impl<'a> SqlxAdapter {
     pub async fn new() -> Result<Self> {
+        use dotenv::dotenv;
+        dotenv().ok();
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is required");
         let pool_size: u32 = std::env::var("POOL_SIZE")
             .ok()

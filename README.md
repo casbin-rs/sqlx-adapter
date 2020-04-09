@@ -24,18 +24,111 @@ async-std = "1.5.0"
 
 ## Configure
 
-Create `.env` and put DATABASE_URL inside
+1. Set up database environment
+   
+    You must prepare the database environment so that `Sqlx` can do static check with queries during compile time. One convenient option is using docker to get your database environment ready:
+    
+    ```bash
+    #!/bin/bash
 
-```bash
-DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-POOL_SIZE=8
-```
+    DIS=$(lsb_release -is)
 
-Export DATABASE_URL, POOL_SIZE so that sqlx can do static check during compile time
-```
-export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-export POOL_SIZE=8
-```
+    command -v docker > /dev/null 2>&1 || {
+        echo "Please install docker before running this script." && exit 1;
+    }
+
+    if [ $DIS == "Ubuntu" ] || [ $DIS == "LinuxMint" ]; then
+        sudo apt install -y \
+            libpq-dev \
+            libmysqlclient-dev \
+            postgresql-client \
+            mysql-client-core;
+
+    elif [ $DIS == "Deepin" ]; then
+        sudo apt install -y \
+            libpq-dev \
+            libmysql++-dev \
+            mysql-client \
+            postgresql-client;
+    elif [ $DIS == "ArchLinux" ] || [ $DIS == "ManjaroLinux" ]; then
+        sudo pacman -S libmysqlclient \
+            postgresql-libs \
+            mysql-clients \;
+    else
+        echo "Unsupported system: $DIS" && exit 1;
+    fi
+
+    docker run -itd \
+        --restart always \
+        -e POSTGRES_USER=casbin_rs \
+        -e POSTGRES_PASSWORD=casbin_rs \
+        -e POSTGRES_DB=casbin \
+        -p 5432:5432 \
+        -v /srv/docker/postgresql:/var/lib/postgresql \
+        postgres:11;
+
+    docker run -itd \
+        --restart always \
+        -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+        -e MYSQL_USER=casbin_rs \
+        -e MYSQL_PASSWORD=casbin_rs \
+        -e MYSQL_DATABASE=casbin \
+        -p 3306:3306 \
+        -v /srv/docker/mysql:/var/lib/mysql \
+        mysql:8 \
+        --default-authentication-plugin=mysql_native_password;
+
+    ```
+
+2. Create table `casbin_rules`
+
+    ```bash
+    # PostgreSQL
+    psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+        id SERIAL PRIMARY KEY,
+        ptype VARCHAR NOT NULL,
+        v0 VARCHAR NOT NULL,
+        v1 VARCHAR NOT NULL,
+        v2 VARCHAR NOT NULL,
+        v3 VARCHAR NOT NULL,
+        v4 VARCHAR NOT NULL,
+        v5 VARCHAR NOT NULL,
+        CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+        );"
+
+    # MySQL
+    mysql -h 127.0.0.1 -u casbin_rs -pcasbin_rs casbin 
+
+    CREATE TABLE IF NOT EXISTS casbin_rules (
+        id INT NOT NULL AUTO_INCREMENT,
+        ptype VARCHAR(12) NOT NULL,
+        v0 VARCHAR(128) NOT NULL,
+        v1 VARCHAR(128) NOT NULL,
+        v2 VARCHAR(128) NOT NULL,
+        v3 VARCHAR(128) NOT NULL,
+        v4 VARCHAR(128) NOT NULL,
+        v5 VARCHAR(128) NOT NULL,
+        PRIMARY KEY(id),
+        CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    ```
+
+3. Configure `env`
+
+    Create `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
+
+    ```bash
+    DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+    # DATABASE_URL=mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+    POOL_SIZE=8
+    ```
+
+    Or you can export `DATABASE_URL`, `POOL_SIZE` 
+
+    ```bash
+    export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+    export POOL_SIZE=8
+    ```
 
 
 ## Example
