@@ -17,11 +17,17 @@ async-std = "1.5.0"
 
 ## Configure
 
-create `.env` and put DATABASE_URL inside
+Create `.env` and put DATABASE_URL inside
 
 ```bash
 DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
 POOL_SIZE=8
+```
+
+Export DATABASE_URL, POOL_SIZE so that sqlx can do static check during compile time
+```
+export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+export POOL_SIZE=8
 ```
 
 
