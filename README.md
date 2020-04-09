@@ -29,6 +29,7 @@ POOL_SIZE=8
 
 ```rust
 use casbin::prelude::*;
+use casbin::Result;
 use sqlx_adapter::SqlxAdapter;
 
 #[async_std::main]
