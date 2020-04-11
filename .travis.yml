@@ -33,8 +33,8 @@ before_script:
     CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
     );"
   - mysql -u root -e "CREATE DATABASE casbin;"
-  - mysql -u root -e "CREATE USER casbin_rs IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO casbin_rs;"
-  - mysql -u casbin_rs -p"casbin_rs" -e "CREATE TABLE IF NOT EXISTS casbin_rules (
+  - mysql -u root -e "CREATE USER 'casbin_rs'@'localhost' IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO 'casbin_rs'@'localhost';"
+  - mysql -u casbin_rs -p'casbin_rs' -e "CREATE TABLE IF NOT EXISTS casbin_rules (
     id INT NOT NULL AUTO_INCREMENT,
     ptype VARCHAR(12) NOT NULL,
     v0 VARCHAR(128) NOT NULL,
