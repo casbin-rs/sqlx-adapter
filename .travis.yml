@@ -7,6 +7,7 @@ addons:
       - libssl-dev
 services:
   - postgresql
+  - mysql
 cache: cargo
 rust:
   - stable
@@ -31,9 +32,26 @@ before_script:
     v5 VARCHAR NOT NULL,
     CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
     );"
+  - mysql -u root -e "CREATE DATABASE casbin;"
+  - mysql -u root -e "CREATE USER casbin_rs IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO casbin_rs;"
+  - mysql -u casbin_rs -p"casbin_rs" -e "CREATE TABLE IF NOT EXISTS casbin_rules (
+    id INT NOT NULL AUTO_INCREMENT,
+    ptype VARCHAR(12) NOT NULL,
+    v0 VARCHAR(128) NOT NULL,
+    v1 VARCHAR(128) NOT NULL,
+    v2 VARCHAR(128) NOT NULL,
+    v3 VARCHAR(128) NOT NULL,
+    v4 VARCHAR(128) NOT NULL,
+    v5 VARCHAR(128) NOT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 
 script:
   - cargo clean
-  - cargo build
-  - cargo test
+  - cargo build --no-default-features --features postgres,runtime-async-std
+  - cargo test --no-default-features --features postgres,runtime-async-std
+  - export DATABASE_URL=mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+  - cargo build --no-default-features --features mysql,runtime-async-std
+  - cargo test --no-default-features --features mysql,runtime-async-std
   - cargo fmt --all -- --check

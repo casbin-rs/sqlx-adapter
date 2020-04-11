@@ -115,7 +115,7 @@ async-std = "1.5.0"
 
 3. Configure `env`
 
-    Create `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
+    Rename `sample.env` to `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
 
     ```bash
     DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
