@@ -61,3 +61,4 @@ after_success: |
     # upload report to codecov
     docker run --security-opt seccomp=unconfined -v "$PWD:/volume" xd009642/tarpaulin sh -c "cargo tarpaulin --out Xml"
     bash <(curl -s https://codecov.io/bash)
+  fi
