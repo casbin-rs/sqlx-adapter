@@ -55,3 +55,9 @@ script:
   - cargo build --no-default-features --features mysql,runtime-async-std
   - cargo test --no-default-features --features mysql,runtime-async-std
   - cargo fmt --all -- --check
+
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+    # upload report to codecov
+    docker run --security-opt seccomp=unconfined -v "$PWD:/volume" xd009642/tarpaulin sh -c "cargo tarpaulin --out Xml"
+    bash <(curl -s https://codecov.io/bash)
