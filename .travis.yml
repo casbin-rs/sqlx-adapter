@@ -34,7 +34,7 @@ before_script:
     );"
   - mysql -u root -e "CREATE DATABASE casbin;"
   - mysql -u root -e "CREATE USER 'casbin_rs'@'localhost' IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO 'casbin_rs'@'localhost';"
-  - mysql -u casbin_rs -p'casbin_rs' -e "CREATE TABLE IF NOT EXISTS casbin_rules (
+  - mysql -u casbin_rs -p'casbin_rs' -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
     id INT NOT NULL AUTO_INCREMENT,
     ptype VARCHAR(12) NOT NULL,
     v0 VARCHAR(128) NOT NULL,
