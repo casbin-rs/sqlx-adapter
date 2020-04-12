@@ -59,6 +59,8 @@ script:
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
     # upload report to codecov
-    docker run --security-opt seccomp=unconfined -v "$PWD:/volume" xd009642/tarpaulin sh -c "cargo tarpaulin --out Xml"
+    export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+    cargo install cargo-tarpaulin
+    cargo tarpaulin --out Xml
     bash <(curl -s https://codecov.io/bash)
   fi
