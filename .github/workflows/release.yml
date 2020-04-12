@@ -1,0 +1,75 @@
+name: Auto Release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  release:
+    name: Auto Release by Tags
+    runs-on: ubuntu-18.04
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: casbin_rs
+          POSTGRES_PASSWORD: casbin_rs
+          POSTGRES_DB: casbin
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@master
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          default: true
+
+      - name: Install PostgreSQL Dependencies
+        run: sudo apt-get install libpq-dev postgresql-client
+
+      - name: Create Table
+        run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+          id SERIAL PRIMARY KEY,
+          ptype VARCHAR NOT NULL,
+          v0 VARCHAR NOT NULL,
+          v1 VARCHAR NOT NULL,
+          v2 VARCHAR NOT NULL,
+          v3 VARCHAR NOT NULL,
+          v4 VARCHAR NOT NULL,
+          v5 VARCHAR NOT NULL,
+          CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+          );"
+
+      - name: Cargo Login
+        uses: actions-rs/cargo@v1
+        with:
+          command: login
+          args: -- ${{ secrets.CARGO_TOKEN }}
+
+      - name: Cargo Publish
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          command: publish
+
+      - name: GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false

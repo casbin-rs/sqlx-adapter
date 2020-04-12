@@ -3,6 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/sqlx-adapter.svg)](https://crates.io/crates/sqlx-adapter)
 [![Docs](https://docs.rs/sqlx-adapter/badge.svg)](https://docs.rs/sqlx-adapter)
 [![Build Status](https://travis-ci.org/casbin-rs/sqlx-adapter.svg?branch=master)](https://travis-ci.org/casbin-rs/sqlx-adapter)
+[![codecov](https://codecov.io/gh/casbin-rs/sqlx-adapter/branch/master/graph/badge.svg)](https://codecov.io/gh/casbin-rs/sqlx-adapter)
 
 
 Sqlx Adapter is the [Sqlx](https://github.com/launchbadge/sqlx) adapter for [Casbin-rs](https://github.com/casbin/casbin-rs). With this library, Casbin can load policy from Sqlx supported database or save policy to it with fully asynchronous support.
@@ -17,7 +18,7 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 Add it to `Cargo.toml`
 
 ```rust
-casbin = { version = "0.4.3" }
+casbin = { version = "0.5.0" }
 sqlx-adapter = { version = "0.1.0", features = ["postgres"] }
 async-std = "1.5.0"
 ```
@@ -115,7 +116,7 @@ async-std = "1.5.0"
 
 3. Configure `env`
 
-    Create `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
+    Rename `sample.env` to `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
 
     ```bash
     DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
