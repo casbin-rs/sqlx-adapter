@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use casbin::{error::AdapterError, Adapter, Error as CasbinError, Model, Result};
+use casbin::{error::AdapterError, Adapter, Error as CasbinError, Filter, Model, Result};
 use sqlx::pool::Pool;
 
 use crate::{error::*, models::*};
@@ -8,6 +8,7 @@ use crate::actions as adapter;
 
 pub struct SqlxAdapter {
     pool: Pool<adapter::Connection>,
+    is_filtered: bool,
 }
 
 //pub const TABLE_NAME: &str = "casbin_rules";
@@ -28,7 +29,10 @@ impl<'a> SqlxAdapter {
             .await
             .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-        adapter::new(&pool).await.map(|_| Self { pool })
+        adapter::new(&pool).await.map(|_| Self {
+            pool,
+            is_filtered: false,
+        })
     }
 
     pub(crate) fn save_policy_line(
@@ -83,6 +87,39 @@ impl<'a> SqlxAdapter {
         None
     }
 
+    pub(crate) fn load_filtered_policy_line(
+        &self,
+        casbin_rule: &CasbinRule,
+        f: &Filter,
+    ) -> Option<Vec<String>> {
+        if let Some(sec) = casbin_rule.ptype.chars().next() {
+            if let Some(policy) = self.normalize_policy(casbin_rule) {
+                let mut is_filtered = false;
+                if sec == 'p' {
+                    for (i, rule) in f.p.iter().enumerate() {
+                        if !rule.is_empty() && rule != &policy[i] {
+                            is_filtered = true
+                        }
+                    }
+                } else if sec == 'g' {
+                    for (i, rule) in f.g.iter().enumerate() {
+                        if !rule.is_empty() && rule != &policy[i] {
+                            is_filtered = true
+                        }
+                    }
+                } else {
+                    return None;
+                }
+
+                if !is_filtered {
+                    return Some(policy);
+                }
+            }
+        }
+
+        None
+    }
+
     fn normalize_policy(&self, casbin_rule: &CasbinRule) -> Option<Vec<String>> {
         let mut result = vec![
             &casbin_rule.v0,
@@ -125,6 +162,29 @@ impl Adapter for SqlxAdapter {
                         }
                     }
                 }
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn load_filtered_policy(&mut self, m: &mut dyn Model, f: Filter) -> Result<()> {
+
+        let rules = adapter::load_policy(&self.pool).await?;
+
+        for casbin_rule in &rules {
+            let rule = self.load_filtered_policy_line(casbin_rule, &f);
+
+            if let Some(rule) = rule {
+                if let Some(ref sec) = casbin_rule.ptype.chars().next().map(|x| x.to_string()) {
+                    if let Some(t1) = m.get_mut_model().get_mut(sec) {
+                        if let Some(t2) = t1.get_mut(&casbin_rule.ptype) {
+                            t2.get_mut_policy().insert(rule);
+                        }
+                    }
+                }
+            } else {
+                self.is_filtered = true;
             }
         }
 
@@ -205,6 +265,10 @@ impl Adapter for SqlxAdapter {
         } else {
             Ok(false)
         }
+    }
+
+    fn is_filtered(&self) -> bool {
+        self.is_filtered
     }
 }
 
@@ -388,5 +452,47 @@ mod tests {
             )
             .await
             .is_ok());
+
+        // shadow the previous enforcer
+        let mut e = Enforcer::new(
+            "examples/rbac_with_domains_model.conf",
+            "examples/rbac_with_domains_policy.csv",
+        )
+            .await
+            .unwrap();
+
+        assert!(adapter.save_policy(e.get_mut_model()).await.is_ok());
+        e.set_adapter(adapter).await.unwrap();
+
+        let filter = Filter {
+            p: vec!["", "domain1"],
+            g: vec!["", "", "domain1"],
+        };
+
+        e.load_filtered_policy(filter).await.unwrap();
+        assert!(e
+            .enforce(&["alice", "domain1", "data1", "read"])
+            .await
+            .unwrap());
+        assert!(e
+            .enforce(&["alice", "domain1", "data1", "write"])
+            .await
+            .unwrap());
+        assert!(!e
+            .enforce(&["alice", "domain1", "data2", "read"])
+            .await
+            .unwrap());
+        assert!(!e
+            .enforce(&["alice", "domain1", "data2", "write"])
+            .await
+            .unwrap());
+        assert!(!e
+            .enforce(&["bob", "domain2", "data2", "read"])
+            .await
+            .unwrap());
+        assert!(!e
+            .enforce(&["bob", "domain2", "data2", "write"])
+            .await
+            .unwrap());
     }
 }
