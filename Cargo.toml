@@ -9,7 +9,7 @@ homepage="https://github.com/casbin-rs/sqlx-adapter"
 readme="README.md"
 
 [dependencies]
-casbin = { version = "0.5.1" }
+casbin = { version = "0.6.0" }
 sqlx = {version = "0.3.4", features = [ "macros" ]}
 async-trait = "0.1.30"
 dotenv = { version = "0.15.0", default-features = false}
