@@ -65,7 +65,9 @@ jobs:
             );"
       
       - name: Create MySQL Table
-        run: mysql -u casbin_rs -p'casbin_rs' -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -u casbin_rs -p'casbin_rs' -h127.0.0.1 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
             id INT NOT NULL AUTO_INCREMENT,
             ptype VARCHAR(12) NOT NULL,
             v0 VARCHAR(128) NOT NULL,
@@ -77,6 +79,7 @@ jobs:
             PRIMARY KEY(id),
             CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+          
 
       - name: Cargo Build For PostgreSQL
         uses: actions-rs/cargo@v1
