@@ -496,10 +496,7 @@ pub(crate) async fn save_policy<'a>(
 }
 
 #[cfg(feature = "postgres")]
-pub(crate) async fn add_policy(
-    mut conn: &ConnectionPool,
-    rule: NewCasbinRule<'_>,
-) -> Result<bool> {
+pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
         "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
@@ -520,10 +517,7 @@ pub(crate) async fn add_policy(
 }
 
 #[cfg(feature = "mysql")]
-pub(crate) async fn add_policy(
-    mut conn: &ConnectionPool,
-    rule: NewCasbinRule<'_>,
-) -> Result<bool> {
+pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
         "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( ?, ?, ?, ?, ?, ?, ? )",
