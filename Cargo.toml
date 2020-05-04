@@ -9,7 +9,7 @@ homepage="https://github.com/casbin-rs/sqlx-adapter"
 readme="README.md"
 
 [dependencies]
-casbin = { version = "0.6.0", default-features = false}
+casbin = { version = "0.6.2", default-features = false}
 sqlx = {version = "0.3.4", features = [ "macros" ]}
 async-trait = "0.1.30"
 dotenv = { version = "0.15.0", default-features = false}
@@ -27,4 +27,4 @@ runtime-async-std = ["casbin/runtime-async-std"]
 
 [dev-dependencies]
 async-std = { version = "1.5.0", features = [ "attributes" ] }
-tokio = { version = "0.2.11", features = [ "full" ] }
+tokio = { version = "0.2.20", features = [ "full" ] }
