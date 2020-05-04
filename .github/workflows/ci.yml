@@ -78,13 +78,12 @@ jobs:
             CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
           
-      - name: Cargo Build For PostgreSQL
+      - name: Cargo Build
         uses: actions-rs/cargo@v1
         env:
           DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
         with:
           command: build
-          args: --no-default-features --features postgres,runtime-async-std
 
       - name: Cargo Test For PostgreSQL,async-std
         uses: actions-rs/cargo@v1
@@ -101,14 +100,6 @@ jobs:
         with:
           command: test
           args: --no-default-features --features postgres,runtime-tokio
-
-      - name: Cargo Build For MySQL
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: build
-          args: --no-default-features --features mysql,runtime-async-std
 
       - name: Cargo Test For MySQL,async-std
         uses: actions-rs/cargo@v1
