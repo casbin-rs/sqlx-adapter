@@ -136,8 +136,6 @@ jobs:
 
       - name: Cargo Fmt Check
         uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
         with:
           command: fmt
           args: --all -- --check
