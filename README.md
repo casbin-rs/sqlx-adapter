@@ -18,7 +18,7 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 Add it to `Cargo.toml`
 
 ```rust
-casbin = { version = "0.6.2", default-features = false}
+casbin = { version = "0.6.2", default-features = false }
 sqlx-adapter = { version = "0.2.0", features = ["postgres"] }
 async-std = "1.5.0"
 ```
