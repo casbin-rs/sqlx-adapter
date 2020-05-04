@@ -1,0 +1,64 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  cover:
+    name: Auto Codecov Coverage
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: casbin_rs
+          POSTGRES_PASSWORD: casbin_rs
+          POSTGRES_DB: casbin
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@master
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      
+      - name: Install PostgreSQL Dependencies
+        run: sudo apt-get install libpq-dev postgresql-client
+  
+      - name: Create Table
+        run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+            id SERIAL PRIMARY KEY,
+            ptype VARCHAR NOT NULL,
+            v0 VARCHAR NOT NULL,
+            v1 VARCHAR NOT NULL,
+            v2 VARCHAR NOT NULL,
+            v3 VARCHAR NOT NULL,
+            v4 VARCHAR NOT NULL,
+            v5 VARCHAR NOT NULL,
+            CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+            );"
+
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          args: --out Xml
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
