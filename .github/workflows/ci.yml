@@ -24,18 +24,21 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@master
+
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - name: Set Up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '8.0' 
+          mysql database: 'casbin' 
+          mysql root password: 'password'
+          mysql user: 'casbin_rs' 
+          mysql password: 'casbin_rs'
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -63,8 +66,6 @@ jobs:
       
       - name: Create MySQL Table
         run: |
-          mysql -uroot -ppassword --host 127.0.0.1 -e "CREATE DATABASE casbin;"
-          mysql -uroot -ppassword --host 127.0.0.1 -e "CREATE USER 'casbin_rs'@'localhost' IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO 'casbin_rs'@'localhost';"
           mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
             id INT NOT NULL AUTO_INCREMENT,
             ptype VARCHAR(12) NOT NULL,
