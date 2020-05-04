@@ -116,7 +116,7 @@ jobs:
           DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
         with:
           command: test
-          args: --no-default-features --features runtime-async-std
+          args: --no-default-features --features mysql,runtime-async-std
 
       - name: Cargo Test For MySQL,tokio
         uses: actions-rs/cargo@v1
@@ -124,7 +124,7 @@ jobs:
           DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
         with:
           command: test
-          args: --no-default-features --features runtime-tokio
+          args: --no-default-features --features mysql,runtime-tokio
 
       - name: Cargo Clippy
         uses: actions-rs/cargo@v1
