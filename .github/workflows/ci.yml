@@ -63,9 +63,9 @@ jobs:
       
       - name: Create MySQL Table
         run: |
-          mysql -u root -p'password' --host 127.0.0.1 --port 3306 -e "CREATE DATABASE casbin;"
-          mysql -u root -p'password' --host 127.0.0.1 --port 3306 -e "CREATE USER 'casbin_rs'@'localhost' IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO 'casbin_rs'@'localhost';"
-          mysql -u casbin_rs -p'casbin_rs' --host 127.0.0.1 --port 3306 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
+          mysql -u root -p'password' -e "CREATE DATABASE casbin;"
+          mysql -u root -p'password' -e "CREATE USER 'casbin_rs'@'localhost' IDENTIFIED BY 'casbin_rs'; GRANT ALL ON casbin.* TO 'casbin_rs'@'localhost';"
+          mysql -u casbin_rs -p'casbin_rs' -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
             id INT NOT NULL AUTO_INCREMENT,
             ptype VARCHAR(12) NOT NULL,
             v0 VARCHAR(128) NOT NULL,
