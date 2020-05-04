@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Auto Build CI
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: casbin_rs
+          POSTGRES_PASSWORD: casbin_rs
+          POSTGRES_DB: casbin
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@master
+
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - name: Set Up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '8.0' 
+          mysql database: 'casbin' 
+          mysql user: 'casbin_rs' 
+          mysql password: 'casbin_rs'
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+          override: true
+
+      - name: Install PostgreSQL & MySQL Dependencies
+        run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
+      
+      - name: Create PostgresSQL Table
+        run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+            id SERIAL PRIMARY KEY,
+            ptype VARCHAR NOT NULL,
+            v0 VARCHAR NOT NULL,
+            v1 VARCHAR NOT NULL,
+            v2 VARCHAR NOT NULL,
+            v3 VARCHAR NOT NULL,
+            v4 VARCHAR NOT NULL,
+            v5 VARCHAR NOT NULL,
+            CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+            );"
+      
+      - name: Create MySQL Table
+        run: |
+          mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
+            id INT NOT NULL AUTO_INCREMENT,
+            ptype VARCHAR(12) NOT NULL,
+            v0 VARCHAR(128) NOT NULL,
+            v1 VARCHAR(128) NOT NULL,
+            v2 VARCHAR(128) NOT NULL,
+            v3 VARCHAR(128) NOT NULL,
+            v4 VARCHAR(128) NOT NULL,
+            v5 VARCHAR(128) NOT NULL,
+            PRIMARY KEY(id),
+            CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+          
+      - name: Cargo Build
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          command: build
+
+      - name: Cargo Test For PostgreSQL,async-std
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-async-std
+
+      - name: Cargo Test For PostgreSQL,tokio
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-tokio
+
+      - name: Cargo Test For MySQL,async-std
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-async-std
+
+      - name: Cargo Test For MySQL,tokio
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-tokio
+
+      - name: Cargo Clippy
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+        with:
+          command: clippy
+          args: -- -D warnings
+
+      - name: Cargo Fmt Check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check

@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/sqlx-adapter.svg)](https://crates.io/crates/sqlx-adapter)
 [![Docs](https://docs.rs/sqlx-adapter/badge.svg)](https://docs.rs/sqlx-adapter)
-[![Build Status](https://travis-ci.org/casbin-rs/sqlx-adapter.svg?branch=master)](https://travis-ci.org/casbin-rs/sqlx-adapter)
+[![CI](https://github.com/casbin-rs/sqlx-adapter/workflows/CI/badge.svg)](https://github.com/casbin-rs/sqlx-adapter/actions)
 [![codecov](https://codecov.io/gh/casbin-rs/sqlx-adapter/branch/master/graph/badge.svg)](https://codecov.io/gh/casbin-rs/sqlx-adapter)
 
 
@@ -18,8 +18,8 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 Add it to `Cargo.toml`
 
 ```rust
-casbin = { version = "0.6.0" }
-sqlx-adapter = { version = "0.2.0", features = ["postgres"] }
+casbin = { version = "0.6.2", default-features = false }
+sqlx-adapter = { version = "0.2.1", features = ["postgres"] }
 async-std = "1.5.0"
 ```
 

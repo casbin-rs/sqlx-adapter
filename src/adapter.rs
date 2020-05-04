@@ -169,7 +169,6 @@ impl Adapter for SqlxAdapter {
     }
 
     async fn load_filtered_policy(&mut self, m: &mut dyn Model, f: Filter) -> Result<()> {
-
         let rules = adapter::load_policy(&self.pool).await?;
 
         for casbin_rule in &rules {
@@ -458,8 +457,8 @@ mod tests {
             "examples/rbac_with_domains_model.conf",
             "examples/rbac_with_domains_policy.csv",
         )
-            .await
-            .unwrap();
+        .await
+        .unwrap();
 
         assert!(adapter.save_policy(e.get_mut_model()).await.is_ok());
         e.set_adapter(adapter).await.unwrap();
