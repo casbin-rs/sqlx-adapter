@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use casbin::{error::AdapterError, Adapter, Error as CasbinError, Filter, Model, Result};
 use sqlx::pool::Pool;
+use dotenv::dotenv;
 
 use crate::{error::*, models::*};
 
@@ -15,7 +16,6 @@ pub struct SqlxAdapter {
 
 impl<'a> SqlxAdapter {
     pub async fn new() -> Result<Self> {
-        use dotenv::dotenv;
         dotenv().ok();
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is required");
         let pool_size: u32 = std::env::var("POOL_SIZE")
