@@ -19,7 +19,7 @@ Add it to `Cargo.toml`
 
 ```rust
 casbin = { version = "0.6.2", default-features = false }
-sqlx-adapter = { version = "0.2.1", features = ["postgres"] }
+sqlx-adapter = { version = "0.2.2", features = ["postgres"] }
 async-std = "1.5.0"
 ```
 
