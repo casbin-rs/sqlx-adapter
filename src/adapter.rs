@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use casbin::{error::AdapterError, Adapter, Error as CasbinError, Filter, Model, Result};
-use sqlx::pool::Pool;
 use dotenv::dotenv;
+use sqlx::pool::Pool;
 
 use crate::{error::*, models::*};
 
