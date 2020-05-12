@@ -123,7 +123,7 @@ async-std = "1.5.0"
     POOL_SIZE=8
     ```
 
-    Or you can export `DATABASE_URL`, `POOL_SIZE` 
+    Or you can export `DATABASE_URL`, `POOL_SIZE` (When you are building project, you must use export env way)
 
     ```bash
     export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
