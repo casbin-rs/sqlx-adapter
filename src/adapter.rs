@@ -469,29 +469,11 @@ mod tests {
         };
 
         e.load_filtered_policy(filter).await.unwrap();
-        assert!(e
-            .enforce(&["alice", "domain1", "data1", "read"])
-            .await
-            .unwrap());
-        assert!(e
-            .enforce(&["alice", "domain1", "data1", "write"])
-            .await
-            .unwrap());
-        assert!(!e
-            .enforce(&["alice", "domain1", "data2", "read"])
-            .await
-            .unwrap());
-        assert!(!e
-            .enforce(&["alice", "domain1", "data2", "write"])
-            .await
-            .unwrap());
-        assert!(!e
-            .enforce(&["bob", "domain2", "data2", "read"])
-            .await
-            .unwrap());
-        assert!(!e
-            .enforce(&["bob", "domain2", "data2", "write"])
-            .await
-            .unwrap());
+        assert!(e.enforce(&["alice", "domain1", "data1", "read"]).unwrap());
+        assert!(e.enforce(&["alice", "domain1", "data1", "write"]).unwrap());
+        assert!(!e.enforce(&["alice", "domain1", "data2", "read"]).unwrap());
+        assert!(!e.enforce(&["alice", "domain1", "data2", "write"]).unwrap());
+        assert!(!e.enforce(&["bob", "domain2", "data2", "read"]).unwrap());
+        assert!(!e.enforce(&["bob", "domain2", "data2", "write"]).unwrap());
     }
 }

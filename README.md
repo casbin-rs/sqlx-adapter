@@ -19,7 +19,7 @@ Add it to `Cargo.toml`
 
 ```rust
 sqlx-adapter = { version = "0.2.4", features = ["postgres"] }
-async-std = "1.5.0"
+async-std = "1.6.2"
 ```
 
 ## Configure
