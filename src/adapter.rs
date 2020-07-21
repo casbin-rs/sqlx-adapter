@@ -87,10 +87,10 @@ impl<'a> SqlxAdapter {
         None
     }
 
-    pub(crate) fn load_filtered_policy_line(
+    pub(crate) fn load_filtered_policy_line<'f>(
         &self,
         casbin_rule: &CasbinRule,
-        f: &Filter,
+        f: &Filter<'f>,
     ) -> Option<Vec<String>> {
         if let Some(sec) = casbin_rule.ptype.chars().next() {
             if let Some(policy) = self.normalize_policy(casbin_rule) {
@@ -168,7 +168,7 @@ impl Adapter for SqlxAdapter {
         Ok(())
     }
 
-    async fn load_filtered_policy(&mut self, m: &mut dyn Model, f: Filter) -> Result<()> {
+    async fn load_filtered_policy<'a>(&mut self, m: &mut dyn Model, f: Filter<'a>) -> Result<()> {
         let rules = adapter::load_policy(&self.pool).await?;
 
         for casbin_rule in &rules {
