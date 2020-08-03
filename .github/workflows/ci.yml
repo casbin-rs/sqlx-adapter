@@ -47,8 +47,8 @@ jobs:
           components: rustfmt, clippy
           override: true
 
-      - name: Install PostgreSQL & MySQL Dependencies
-        run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
+#       - name: Install PostgreSQL & MySQL Dependencies
+#         run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
       
       - name: Create PostgresSQL Table
         run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
