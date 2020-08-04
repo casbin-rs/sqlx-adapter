@@ -87,39 +87,6 @@ impl<'a> SqlxAdapter {
         None
     }
 
-    pub(crate) fn load_filtered_policy_line<'f>(
-        &self,
-        casbin_rule: &CasbinRule,
-        f: &Filter<'f>,
-    ) -> Option<Vec<String>> {
-        if let Some(sec) = casbin_rule.ptype.chars().next() {
-            if let Some(policy) = self.normalize_policy(casbin_rule) {
-                let mut is_filtered = false;
-                if sec == 'p' {
-                    for (i, rule) in f.p.iter().enumerate() {
-                        if !rule.is_empty() && rule != &policy[i] {
-                            is_filtered = true
-                        }
-                    }
-                } else if sec == 'g' {
-                    for (i, rule) in f.g.iter().enumerate() {
-                        if !rule.is_empty() && rule != &policy[i] {
-                            is_filtered = true
-                        }
-                    }
-                } else {
-                    return None;
-                }
-
-                if !is_filtered {
-                    return Some(policy);
-                }
-            }
-        }
-
-        None
-    }
-
     fn normalize_policy(&self, casbin_rule: &CasbinRule) -> Option<Vec<String>> {
         let mut result = vec![
             &casbin_rule.v0,
@@ -169,21 +136,18 @@ impl Adapter for SqlxAdapter {
     }
 
     async fn load_filtered_policy<'a>(&mut self, m: &mut dyn Model, f: Filter<'a>) -> Result<()> {
-        let rules = adapter::load_policy(&self.pool).await?;
+        let rules = adapter::load_filtered_policy(&self.pool, &f).await?;
+        self.is_filtered = true;
 
         for casbin_rule in &rules {
-            let rule = self.load_filtered_policy_line(casbin_rule, &f);
-
-            if let Some(rule) = rule {
+            if let Some(policy) = self.normalize_policy(casbin_rule) {
                 if let Some(ref sec) = casbin_rule.ptype.chars().next().map(|x| x.to_string()) {
                     if let Some(t1) = m.get_mut_model().get_mut(sec) {
                         if let Some(t2) = t1.get_mut(&casbin_rule.ptype) {
-                            t2.get_mut_policy().insert(rule);
+                            t2.get_mut_policy().insert(policy);
                         }
                     }
                 }
-            } else {
-                self.is_filtered = true;
             }
         }
 

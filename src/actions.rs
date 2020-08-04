@@ -1,5 +1,5 @@
 use crate::Error;
-use casbin::{error::AdapterError, Error as CasbinError, Result};
+use casbin::{error::AdapterError, Error as CasbinError, Filter, Result};
 use sqlx::{error::Error as SqlxError, pool::Pool};
 
 use crate::models::{CasbinRule, NewCasbinRule};
@@ -407,6 +407,69 @@ pub(crate) async fn load_policy(mut conn: &ConnectionPool) -> Result<Vec<CasbinR
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(casbin_rules)
+}
+
+#[cfg(feature = "postgres")]
+pub(crate) async fn load_filtered_policy<'a>(
+    mut conn: &ConnectionPool,
+    filter: &Filter<'_>,
+) -> Result<Vec<CasbinRule>> {
+    let (g_filter, p_filter) = filtered_where_values(filter);
+
+    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
+        CasbinRule,
+        "SELECT * from  casbin_rules WHERE (
+            ptype LIKE 'g%' AND v0 LIKE $1 AND v1 LIKE $2 AND v2 LIKE $3 AND v3 LIKE $4 AND v4 LIKE $5 AND v5 LIKE $6 )
+        OR (
+            ptype LIKE 'p%' AND v0 LIKE $7 AND v1 LIKE $8 AND v2 LIKE $9 AND v3 LIKE $10 AND v4 LIKE $11 AND v5 LIKE $12 );
+            ",
+            g_filter[0], g_filter[1], g_filter[2], g_filter[3], g_filter[4], g_filter[5],
+            p_filter[0], p_filter[1], p_filter[2], p_filter[3], p_filter[4], p_filter[5],)
+    .fetch_all(&mut conn)
+    .await
+    .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+
+    Ok(casbin_rules)
+}
+
+#[cfg(feature = "mysql")]
+pub(crate) async fn load_filtered_policy<'a>(
+    mut conn: &ConnectionPool,
+    filter: &Filter<'_>,
+) -> Result<Vec<CasbinRule>> {
+    let (g_filter, p_filter) = filtered_where_values(filter);
+
+    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
+        CasbinRule,
+        "SELECT * from  casbin_rules WHERE (
+            ptype LIKE 'g%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? )
+        OR (
+            ptype LIKE 'p%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? );
+            ",
+            g_filter[0], g_filter[1], g_filter[2], g_filter[3], g_filter[4], g_filter[5],
+            p_filter[0], p_filter[1], p_filter[2], p_filter[3], p_filter[4], p_filter[5],
+    )
+    .fetch_all(&mut conn)
+    .await
+    .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+
+    Ok(casbin_rules)
+}
+
+fn filtered_where_values<'a>(filter: &Filter<'a>) -> ([&'a str; 6], [&'a str; 6]) {
+    let mut g_filter: [&'a str; 6] = ["%", "%", "%", "%", "%", "%"];
+    let mut p_filter: [&'a str; 6] = ["%", "%", "%", "%", "%", "%"];
+    for (idx, val) in filter.g.iter().enumerate() {
+        if val != &"" {
+            g_filter[idx] = val;
+        }
+    }
+    for (idx, val) in filter.p.iter().enumerate() {
+        if val != &"" {
+            p_filter[idx] = val;
+        }
+    }
+    (g_filter, p_filter)
 }
 
 #[cfg(feature = "postgres")]
