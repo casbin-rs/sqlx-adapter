@@ -414,18 +414,7 @@ pub(crate) async fn load_filtered_policy<'a>(
     mut conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
-    let mut g_filter: [&str; 6] = ["%", "%", "%", "%", "%", "%"];
-    let mut p_filter: [&str; 6] = ["%", "%", "%", "%", "%", "%"];
-    for (idx, val) in filter.g.iter().enumerate() {
-        if val != &"" {
-            g_filter[idx] = val;
-        }
-    }
-    for (idx, val) in filter.p.iter().enumerate() {
-        if val != &"" {
-            p_filter[idx] = val;
-        }
-    }
+    let (g_filter, p_filter) = filtered_where_values(filter);
 
     let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
         CasbinRule,
@@ -448,18 +437,7 @@ pub(crate) async fn load_filtered_policy<'a>(
     mut conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
-    let mut g_filter: [&str; 6] = ["%", "%", "%", "%", "%", "%"];
-    let mut p_filter: [&str; 6] = ["%", "%", "%", "%", "%", "%"];
-    for (idx, val) in filter.g.iter().enumerate() {
-        if val != &"" {
-            g_filter[idx] = val;
-        }
-    }
-    for (idx, val) in filter.p.iter().enumerate() {
-        if val != &"" {
-            p_filter[idx] = val;
-        }
-    }
+    let (g_filter, p_filter) = filtered_where_values(filter);
 
     let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
         CasbinRule,
@@ -476,6 +454,22 @@ pub(crate) async fn load_filtered_policy<'a>(
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(casbin_rules)
+}
+
+fn filtered_where_values<'a>(filter: &Filter<'a>) -> ([&'a str; 6], [&'a str; 6]) {
+    let mut g_filter: [&'a str; 6] = ["%", "%", "%", "%", "%", "%"];
+    let mut p_filter: [&'a str; 6] = ["%", "%", "%", "%", "%", "%"];
+    for (idx, val) in filter.g.iter().enumerate() {
+        if val != &"" {
+            g_filter[idx] = val;
+        }
+    }
+    for (idx, val) in filter.p.iter().enumerate() {
+        if val != &"" {
+            p_filter[idx] = val;
+        }
+    }
+    (g_filter, p_filter)
 }
 
 #[cfg(feature = "postgres")]
