@@ -102,7 +102,7 @@ jobs:
       - name: Cargo Test For MySQL,async-std
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:${{ job.services.mysql.ports[3306] }}/casbin
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
           args: --no-default-features --features mysql,runtime-async-std
@@ -110,7 +110,7 @@ jobs:
       - name: Cargo Test For MySQL,tokio
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:${{ job.services.mysql.ports[3306] }}/casbin
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
           args: --no-default-features --features mysql,runtime-tokio
