@@ -1,18 +1,25 @@
+#![allow(clippy::suspicious_else_formatting)]
+#![allow(clippy::toplevel_ref_arg)]
 use crate::Error;
 use casbin::{error::AdapterError, Error as CasbinError, Filter, Result};
-use sqlx::{error::Error as SqlxError, pool::Pool};
+use sqlx::{error::Error as SqlxError, Done};
 
 use crate::models::{CasbinRule, NewCasbinRule};
 
 #[cfg(feature = "postgres")]
-pub type Connection = sqlx::PgConnection;
-#[cfg(feature = "mysql")]
-pub type Connection = sqlx::MySqlConnection;
+use sqlx::postgres::PgDone;
 
-type ConnectionPool = Pool<Connection>;
+#[cfg(feature = "mysql")]
+use sqlx::mysql::MySqlDone;
 
 #[cfg(feature = "postgres")]
-pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
+pub type ConnectionPool = sqlx::PgPool;
+
+#[cfg(feature = "mysql")]
+pub type ConnectionPool = sqlx::MySqlPool;
+
+#[cfg(feature = "postgres")]
+pub async fn new(conn: &ConnectionPool) -> Result<PgDone> {
     sqlx::query!(
         "CREATE TABLE IF NOT EXISTS casbin_rules (
                     id SERIAL PRIMARY KEY,
@@ -27,13 +34,13 @@ pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
                     );
         "
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
 #[cfg(feature = "mysql")]
-pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
+pub async fn new(conn: &ConnectionPool) -> Result<MySqlDone> {
     sqlx::query!(
         "CREATE TABLE IF NOT EXISTS casbin_rules (
                     id INT NOT NULL AUTO_INCREMENT,
@@ -48,13 +55,13 @@ pub async fn new(mut conn: &ConnectionPool) -> Result<u64> {
                     CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
 #[cfg(feature = "postgres")]
-pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
+pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
     let rule = normalize_casbin_rule(rule, 0);
     sqlx::query!(
         "DELETE FROM casbin_rules WHERE
@@ -73,14 +80,14 @@ pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String
         rule[4],
         rule[5]
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
-    .map(|n| n == 1)
+    .map(|n| Done::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
 #[cfg(feature = "mysql")]
-pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
+pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
     let rule = normalize_casbin_rule(rule, 0);
     sqlx::query!(
         "DELETE FROM casbin_rules WHERE
@@ -99,9 +106,9 @@ pub async fn remove_policy(mut conn: &ConnectionPool, pt: &str, rule: Vec<String
         rule[4],
         rule[5]
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
-    .map(|n| n == 1)
+    .map(|n| Done::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -137,7 +144,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -184,7 +191,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -201,7 +208,7 @@ pub async fn remove_policies(
 
 #[cfg(feature = "postgres")]
 pub async fn remove_filtered_policy(
-    mut conn: &ConnectionPool,
+    conn: &ConnectionPool,
     pt: &str,
     field_index: usize,
     field_values: Vec<String>,
@@ -288,15 +295,15 @@ pub async fn remove_filtered_policy(
     };
 
     boxed_query
-        .execute(&mut conn)
+        .execute(conn)
         .await
-        .map(|n| n >= 1)
+        .map(|n| Done::rows_affected(&n) >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
 #[cfg(feature = "mysql")]
 pub async fn remove_filtered_policy(
-    mut conn: &ConnectionPool,
+    conn: &ConnectionPool,
     pt: &str,
     field_index: usize,
     field_values: Vec<String>,
@@ -383,16 +390,16 @@ pub async fn remove_filtered_policy(
     };
 
     boxed_query
-        .execute(&mut conn)
+        .execute(conn)
         .await
-        .map(|n| n >= 1)
+        .map(|n| Done::rows_affected(&n) >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
 #[cfg(feature = "postgres")]
-pub(crate) async fn load_policy(mut conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
+pub(crate) async fn load_policy(conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
     let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rules")
-        .fetch_all(&mut conn)
+        .fetch_all(conn)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -400,9 +407,9 @@ pub(crate) async fn load_policy(mut conn: &ConnectionPool) -> Result<Vec<CasbinR
 }
 
 #[cfg(feature = "mysql")]
-pub(crate) async fn load_policy(mut conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
+pub(crate) async fn load_policy(conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
     let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rules")
-        .fetch_all(&mut conn)
+        .fetch_all(conn)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -411,7 +418,7 @@ pub(crate) async fn load_policy(mut conn: &ConnectionPool) -> Result<Vec<CasbinR
 
 #[cfg(feature = "postgres")]
 pub(crate) async fn load_filtered_policy<'a>(
-    mut conn: &ConnectionPool,
+    conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
     let (g_filter, p_filter) = filtered_where_values(filter);
@@ -425,7 +432,7 @@ pub(crate) async fn load_filtered_policy<'a>(
             ",
             g_filter[0], g_filter[1], g_filter[2], g_filter[3], g_filter[4], g_filter[5],
             p_filter[0], p_filter[1], p_filter[2], p_filter[3], p_filter[4], p_filter[5],)
-    .fetch_all(&mut conn)
+    .fetch_all(conn)
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -434,7 +441,7 @@ pub(crate) async fn load_filtered_policy<'a>(
 
 #[cfg(feature = "mysql")]
 pub(crate) async fn load_filtered_policy<'a>(
-    mut conn: &ConnectionPool,
+    conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
     let (g_filter, p_filter) = filtered_where_values(filter);
@@ -449,7 +456,7 @@ pub(crate) async fn load_filtered_policy<'a>(
             g_filter[0], g_filter[1], g_filter[2], g_filter[3], g_filter[4], g_filter[5],
             p_filter[0], p_filter[1], p_filter[2], p_filter[3], p_filter[4], p_filter[5],
     )
-    .fetch_all(&mut conn)
+    .fetch_all(conn)
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -500,7 +507,7 @@ pub(crate) async fn save_policy<'a>(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -543,7 +550,7 @@ pub(crate) async fn save_policy<'a>(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -559,7 +566,7 @@ pub(crate) async fn save_policy<'a>(
 }
 
 #[cfg(feature = "postgres")]
-pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
+pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
         "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
@@ -571,16 +578,16 @@ pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_
         rule.v4,
         rule.v5
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
-    .map(|n| n == 1)
+    .map(|n| Done::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
 }
 
 #[cfg(feature = "mysql")]
-pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
+pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
         "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( ?, ?, ?, ?, ?, ?, ? )",
@@ -592,9 +599,9 @@ pub(crate) async fn add_policy(mut conn: &ConnectionPool, rule: NewCasbinRule<'_
         rule.v4,
         rule.v5
     )
-    .execute(&mut conn)
+    .execute(conn)
     .await
-    .map(|n| n == 1)
+    .map(|n| Done::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
@@ -624,7 +631,7 @@ pub(crate) async fn add_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -663,7 +670,7 @@ pub(crate) async fn add_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if n == 1 {
+            if Done::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -676,6 +683,40 @@ pub(crate) async fn add_policies(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     Ok(true)
+}
+
+#[cfg(feature = "postgres")]
+pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
+    let mut transaction = conn
+        .begin()
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    sqlx::query!("DELETE FROM casbin_rules")
+        .execute(&mut transaction)
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    transaction
+        .commit()
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
+    let mut transaction = conn
+        .begin()
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    sqlx::query!("DELETE FROM casbin_rules")
+        .execute(&mut transaction)
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    transaction
+        .commit()
+        .await
+        .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+    Ok(())
 }
 
 fn normalize_casbin_rule(mut rule: Vec<String>, field_index: usize) -> Vec<String> {
