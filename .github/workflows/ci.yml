@@ -39,9 +39,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@master
 
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop
-
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
