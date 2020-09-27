@@ -2,3 +2,4 @@
 .env
 .idea/
 Cargo.lock
+.DS_Store

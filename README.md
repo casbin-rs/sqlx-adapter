@@ -18,8 +18,8 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 Add it to `Cargo.toml`
 
 ```rust
-sqlx-adapter = { version = "0.2.6", features = ["postgres"] }
-async-std = "1.6.2"
+sqlx-adapter = { version = "0.3.0", features = ["postgres"] }
+async-std = "1.6.4"
 ```
 
 ## Configure
@@ -123,7 +123,7 @@ async-std = "1.6.2"
     POOL_SIZE=8
     ```
 
-    Or you can export `DATABASE_URL`, `POOL_SIZE` (When you are building project, you must use export env way)
+    Or you can export `DATABASE_URL`, `POOL_SIZE`
 
     ```bash
     export DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
@@ -142,7 +142,7 @@ use sqlx_adapter::SqlxAdapter;
 async fn main() -> Result<()> {
     let m = DefaultModel::from_file("examples/rbac_model.conf").await?;
     
-    let a = SqlxAdapter::new().await?;
+    let a = SqlxAdapter::new("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin", 8).await?;
     let mut e = Enforcer::new(m, a).await?;
     
     Ok(())

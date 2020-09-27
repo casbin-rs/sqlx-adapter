@@ -1,31 +1,38 @@
 use async_trait::async_trait;
 use casbin::{error::AdapterError, Adapter, Error as CasbinError, Filter, Model, Result};
 use dotenv::dotenv;
-use sqlx::pool::Pool;
 
 use crate::{error::*, models::*};
 
 use crate::actions as adapter;
 
+#[cfg(feature = "mysql")]
+use sqlx::mysql::MySqlPoolOptions;
+#[cfg(feature = "postgres")]
+use sqlx::postgres::PgPoolOptions;
+
 pub struct SqlxAdapter {
-    pool: Pool<adapter::Connection>,
+    pool: adapter::ConnectionPool,
     is_filtered: bool,
 }
 
 //pub const TABLE_NAME: &str = "casbin_rules";
 
 impl<'a> SqlxAdapter {
-    pub async fn new() -> Result<Self> {
+    pub async fn new<U: Into<String>>(url: U, pool_size: u32) -> Result<Self> {
         dotenv().ok();
-        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is required");
-        let pool_size: u32 = std::env::var("POOL_SIZE")
-            .ok()
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(8);
 
-        let pool = Pool::builder()
-            .max_size(pool_size)
-            .build(&database_url)
+        #[cfg(feature = "postgres")]
+        let pool = PgPoolOptions::new()
+            .max_connections(pool_size)
+            .connect(&url.into())
+            .await
+            .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+
+        #[cfg(feature = "mysql")]
+        let pool = MySqlPoolOptions::new()
+            .max_connections(pool_size)
+            .connect(&url.into())
             .await
             .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
@@ -230,6 +237,10 @@ impl Adapter for SqlxAdapter {
         }
     }
 
+    async fn clear_policy(&mut self) -> Result<()> {
+        adapter::clear_policy(&self.pool).await
+    }
+
     fn is_filtered(&self) -> bool {
         self.is_filtered
     }
@@ -252,7 +263,21 @@ mod tests {
             .await
             .unwrap();
 
-        let adapter = SqlxAdapter::new().await.unwrap();
+        let adapter = {
+            #[cfg(feature = "postgres")]
+            {
+                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin", 8)
+                    .await
+                    .unwrap()
+            }
+
+            #[cfg(feature = "mysql")]
+            {
+                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin", 8)
+                    .await
+                    .unwrap()
+            }
+        };
 
         assert!(Enforcer::new(m, adapter).await.is_ok());
     }
@@ -269,7 +294,21 @@ mod tests {
             .unwrap();
 
         let mut e = Enforcer::new(m, file_adapter).await.unwrap();
-        let mut adapter = SqlxAdapter::new().await.unwrap();
+        let mut adapter = {
+            #[cfg(feature = "postgres")]
+            {
+                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin", 8)
+                    .await
+                    .unwrap()
+            }
+
+            #[cfg(feature = "mysql")]
+            {
+                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin", 8)
+                    .await
+                    .unwrap()
+            }
+        };
 
         assert!(adapter.save_policy(e.get_mut_model()).await.is_ok());
 
@@ -433,11 +472,11 @@ mod tests {
         };
 
         e.load_filtered_policy(filter).await.unwrap();
-        assert!(e.enforce(&["alice", "domain1", "data1", "read"]).unwrap());
-        assert!(e.enforce(&["alice", "domain1", "data1", "write"]).unwrap());
-        assert!(!e.enforce(&["alice", "domain1", "data2", "read"]).unwrap());
-        assert!(!e.enforce(&["alice", "domain1", "data2", "write"]).unwrap());
-        assert!(!e.enforce(&["bob", "domain2", "data2", "read"]).unwrap());
-        assert!(!e.enforce(&["bob", "domain2", "data2", "write"]).unwrap());
+        assert!(e.enforce(("alice", "domain1", "data1", "read")).unwrap());
+        assert!(e.enforce(("alice", "domain1", "data1", "write")).unwrap());
+        assert!(!e.enforce(("alice", "domain1", "data2", "read")).unwrap());
+        assert!(!e.enforce(("alice", "domain1", "data2", "write")).unwrap());
+        assert!(!e.enforce(("bob", "domain2", "data2", "read")).unwrap());
+        assert!(!e.enforce(("bob", "domain2", "data2", "write")).unwrap());
     }
 }
