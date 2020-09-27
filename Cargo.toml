@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-adapter"
-version = "0.2.6"
+version = "0.3.0"
 authors = ["Eason Chai <hackerchai.com@gmail.com>","Cheng JIANG <jiang.cheng@vip.163.com>"]
 edition = "2018"
 license = "Apache-2.0"
