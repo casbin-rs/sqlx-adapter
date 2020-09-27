@@ -29,6 +29,7 @@ jobs:
         env:
           MYSQL_USER: casbin_rs
           MYSQL_PASSWORD: casbin_rs
+          MYSQL_ROOT_PASSWOED: root
           MYSQL_DATABASE: casbin
         ports:
           - 3306:3306
