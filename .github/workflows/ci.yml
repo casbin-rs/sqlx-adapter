@@ -24,20 +24,23 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: casbin
+          MYSQL_USER: casbin_rs
+          MYSQL_PASSWORD: casbin_rs
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@master
 
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
-
-      - name: Set Up MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: '8.0'
-          mysql database: 'casbin'
-          mysql user: 'casbin_rs'
-          mysql password: 'casbin_rs'
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -65,7 +68,7 @@ jobs:
 
       - name: Create MySQL Table
         run: |
-          mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
+          mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
             id INT NOT NULL AUTO_INCREMENT,
             ptype VARCHAR(12) NOT NULL,
             v0 VARCHAR(128) NOT NULL,
@@ -102,7 +105,7 @@ jobs:
       - name: Cargo Test For MySQL,async-std
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
           args: --no-default-features --features mysql,runtime-async-std
@@ -110,7 +113,7 @@ jobs:
       - name: Cargo Test For MySQL,tokio
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
           args: --no-default-features --features mysql,runtime-tokio
