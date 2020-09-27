@@ -47,22 +47,22 @@ jobs:
           components: rustfmt, clippy
           override: true
 
-     - name: Install PostgreSQL & MySQL Dependencies
-       run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
-      
+      - name: Install PostgreSQL & MySQL Dependencies
+        run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
+
       - name: Create PostgresSQL Table
         run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
-            id SERIAL PRIMARY KEY,
-            ptype VARCHAR NOT NULL,
-            v0 VARCHAR NOT NULL,
-            v1 VARCHAR NOT NULL,
-            v2 VARCHAR NOT NULL,
-            v3 VARCHAR NOT NULL,
-            v4 VARCHAR NOT NULL,
-            v5 VARCHAR NOT NULL,
-            CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
-            );"
-      
+          id SERIAL PRIMARY KEY,
+          ptype VARCHAR NOT NULL,
+          v0 VARCHAR NOT NULL,
+          v1 VARCHAR NOT NULL,
+          v2 VARCHAR NOT NULL,
+          v3 VARCHAR NOT NULL,
+          v4 VARCHAR NOT NULL,
+          v5 VARCHAR NOT NULL,
+          CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+          );"
+
       - name: Create MySQL Table
         run: |
           mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
@@ -77,9 +77,11 @@ jobs:
             PRIMARY KEY(id),
             CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
-          
+
       - name: Cargo Build
         uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
         with:
           command: build
 
