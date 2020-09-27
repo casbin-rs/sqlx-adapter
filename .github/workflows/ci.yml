@@ -24,20 +24,19 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_USER: casbin_rs
+          MYSQL_PASSWORD: casbin_rs
+          MYSQL_DATABASE: casbin
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@master
-
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop
-
-      - name: Set Up MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: '8.0' 
-          mysql database: 'casbin' 
-          mysql user: 'casbin_rs' 
-          mysql password: 'casbin_rs'
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
