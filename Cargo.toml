@@ -13,7 +13,7 @@ casbin = { version = "2.0.2", default-features = false }
 sqlx = {version = "0.4.0-beta.1", default-features = false, features = [ "macros" ]}
 async-trait = "0.1.40"
 dotenv = { version = "0.15.0", default-features = false }
-tokio = { version = "0.3.1", default-features = false, optional = true }
+tokio = { version = "1.0.0", default-features = false, optional = true }
 async-std = { version = "1.6.4", default-features = false, optional = true }
 
 [features]
@@ -32,4 +32,4 @@ offline = ["sqlx/offline"]
 
 [dev-dependencies]
 async-std = { version = "1.6.4", features = [ "attributes" ] }
-tokio = { version = "0.3.1", features = [ "full" ] }
+tokio = { version = "1.0.0", features = [ "full" ] }
