@@ -254,8 +254,21 @@ mod tests {
         v.into_iter().map(|x| x.to_owned()).collect()
     }
 
-    #[cfg_attr(feature = "runtime-async-std", async_std::test)]
-    #[cfg_attr(feature = "runtime-tokio", tokio::test)]
+    #[cfg_attr(
+        any(
+            feature = "runtime-async-std-native-tls",
+            feature = "runtime-async-std-rustls"
+        ),
+        async_std::test
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
+        tokio::test
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
+        actix_rt::test
+    )]
     async fn test_create() {
         use casbin::prelude::*;
 
@@ -282,8 +295,21 @@ mod tests {
         assert!(Enforcer::new(m, adapter).await.is_ok());
     }
 
-    #[cfg_attr(feature = "runtime-async-std", async_std::test)]
-    #[cfg_attr(feature = "runtime-tokio", tokio::test)]
+    #[cfg_attr(
+        any(
+            feature = "runtime-async-std-native-tls",
+            feature = "runtime-async-std-rustls"
+        ),
+        async_std::test
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
+        tokio::test
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
+        actix_rt::test
+    )]
     async fn test_adapter() {
         use casbin::prelude::*;
 
