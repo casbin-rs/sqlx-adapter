@@ -1,10 +1,8 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
+  push:
     branches:
       - master
 
@@ -25,7 +23,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:8.0
+        image: mariadb
         env:
           MYSQL_DATABASE: casbin
           MYSQL_USER: casbin_rs
@@ -83,37 +81,109 @@ jobs:
         with:
           command: build
 
-      - name: Cargo Test For PostgreSQL,async-std
+      # PostgreSQL tests
+      # async-std
+      - name: Cargo Test For PostgreSQL,runtime-async-std-native-tls
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
         with:
           command: test
-          args: --no-default-features --features postgres,runtime-async-std
+          args: --no-default-features --features postgres,runtime-async-std-native-tls
 
-      - name: Cargo Test For PostgreSQL,tokio
+      - name: Cargo Test For PostgreSQL,runtime-async-std-rustls
         uses: actions-rs/cargo@v1
         env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
         with:
           command: test
-          args: --no-default-features --features postgres,runtime-tokio
+          args: --no-default-features --features postgres,runtime-async-std-rustls
 
-      - name: Cargo Test For MySQL,async-std
+      # tokio
+      - name: Cargo Test For PostgreSQL,runtime-tokio-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-tokio-native-tls
+
+      - name: Cargo Test For PostgreSQL,runtime-tokio-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-tokio-rustls
+
+      # actix
+      - name: Cargo Test For PostgreSQL,runtime-actix-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-actix-native-tls
+
+      - name: Cargo Test For PostgreSQL,runtime-actix-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin
+        with:
+          command: test
+          args: --no-default-features --features postgres,runtime-actix-rustls
+
+      # MySQL
+      # async-std
+      - name: Cargo Test For MySQL,runtime-async-std-native-tls
         uses: actions-rs/cargo@v1
         env:
           DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
-          args: --no-default-features --features mysql,runtime-async-std
+          args: --no-default-features --features mysql,runtime-async-std-native-tls
 
-      - name: Cargo Test For MySQL,tokio
+      - name: Cargo Test For MySQL,runtime-async-std-rustls
         uses: actions-rs/cargo@v1
         env:
           DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
         with:
           command: test
-          args: --no-default-features --features mysql,runtime-tokio
+          args: --no-default-features --features mysql,runtime-async-std-rustls
+
+      # tokio
+      - name: Cargo Test For MySQL,runtime-tokio-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-tokio-native-tls
+
+      - name: Cargo Test For MySQL,runtime-tokio-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-tokio-rustls
+
+      # actix
+      - name: Cargo Test For MySQL,runtime-actix-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-actix-native-tls
+
+      - name: Cargo Test For MySQL,runtime-actix-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: mysql://casbin_rs:casbin_rs@127.0.0.1:${{ job.services.mysql.ports[3306] }}/casbin
+        with:
+          command: test
+          args: --no-default-features --features mysql,runtime-actix-rustls
 
       - name: Cargo Clippy
         uses: actions-rs/cargo@v1

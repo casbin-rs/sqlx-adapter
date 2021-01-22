@@ -480,9 +480,9 @@ fn filtered_where_values<'a>(filter: &Filter<'a>) -> ([&'a str; 6], [&'a str; 6]
 }
 
 #[cfg(feature = "postgres")]
-pub(crate) async fn save_policy<'a>(
+pub(crate) async fn save_policy(
     conn: &ConnectionPool,
-    rules: Vec<NewCasbinRule<'a>>,
+    rules: Vec<NewCasbinRule<'_>>,
 ) -> Result<()> {
     let mut transaction = conn
         .begin()

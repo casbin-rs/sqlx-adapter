@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-adapter"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Eason Chai <hackerchai.com@gmail.com>","Cheng JIANG <jiang.cheng@vip.163.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -9,27 +9,38 @@ homepage= "https://github.com/casbin-rs/sqlx-adapter"
 readme= "README.md"
 
 [dependencies]
-casbin = { version = "2.0.2", default-features = false }
-sqlx = {version = "0.4.0-beta.1", default-features = false, features = [ "macros" ]}
-async-trait = "0.1.40"
+casbin = { version = "2.0.5", default-features = false }
+sqlx = { version = "0.4.2", default-features = false, features = [ "macros" ] }
+async-trait = "0.1.42"
 dotenv = { version = "0.15.0", default-features = false }
-tokio = { version = "0.3.1", default-features = false, optional = true }
-async-std = { version = "1.6.4", default-features = false, optional = true }
+# Force tokio version at 0.2.x until sqlx is updated
+tokio = { version = "0.2.24", default-features = false, optional = true }
+async-std = { version = "1.9.0", default-features = false, optional = true }
+actix-rt = { version = "1.1.1", default-features = false, optional = true }
 
 [features]
-default = ["postgres", "runtime-async-std", "offline"]
+default = ["postgres", "runtime-async-std-native-tls", "offline"]
 
 #databases
 postgres = ["sqlx/postgres"]
 mysql = ["sqlx/mysql"]
 
-#async runtime
-runtime-tokio = ["casbin/runtime-tokio", "sqlx/runtime-tokio"]
-runtime-async-std = ["casbin/runtime-async-std", "sqlx/runtime-async-std"]
+# async runtime
+# async-std
+runtime-async-std-native-tls = ["casbin/runtime-async-std", "sqlx/runtime-async-std-native-tls"]
+runtime-async-std-rustls = ["casbin/runtime-async-std", "sqlx/runtime-async-std-rustls"]
+# tokio
+runtime-tokio-native-tls = ["casbin/runtime-tokio", "sqlx/runtime-tokio-native-tls"]
+runtime-tokio-rustls = ["casbin/runtime-tokio", "sqlx/runtime-tokio-rustls"]
+# actix (actually based on tokio)
+runtime-actix-native-tls = ["casbin/runtime-tokio", "sqlx/runtime-actix-native-tls"]
+runtime-actix-rustls = ["casbin/runtime-tokio", "sqlx/runtime-actix-rustls"]
 
 #offline mode for sqlx
 offline = ["sqlx/offline"]
 
 [dev-dependencies]
-async-std = { version = "1.6.4", features = [ "attributes" ] }
-tokio = { version = "0.3.1", features = [ "full" ] }
+async-std = { version = "1.9.0", features = [ "attributes" ] }
+# Force tokio version at 0.2.x until sqlx is updated
+tokio = { version = "0.2.24", features = [ "full" ] }
+actix-rt = { version = "1.1.1" }
