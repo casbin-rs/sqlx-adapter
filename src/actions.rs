@@ -21,7 +21,7 @@ pub type ConnectionPool = sqlx::MySqlPool;
 #[cfg(feature = "postgres")]
 pub async fn new(conn: &ConnectionPool) -> Result<PgDone> {
     sqlx::query!(
-        "CREATE TABLE IF NOT EXISTS casbin_rules (
+        "CREATE TABLE IF NOT EXISTS casbin_rule (
                     id SERIAL PRIMARY KEY,
                     ptype VARCHAR NOT NULL,
                     v0 VARCHAR NOT NULL,
@@ -42,7 +42,7 @@ pub async fn new(conn: &ConnectionPool) -> Result<PgDone> {
 #[cfg(feature = "mysql")]
 pub async fn new(conn: &ConnectionPool) -> Result<MySqlDone> {
     sqlx::query!(
-        "CREATE TABLE IF NOT EXISTS casbin_rules (
+        "CREATE TABLE IF NOT EXISTS casbin_rule (
                     id INT NOT NULL AUTO_INCREMENT,
                     ptype VARCHAR(12) NOT NULL,
                     v0 VARCHAR(128) NOT NULL,
@@ -64,7 +64,7 @@ pub async fn new(conn: &ConnectionPool) -> Result<MySqlDone> {
 pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
     let rule = normalize_casbin_rule(rule, 0);
     sqlx::query!(
-        "DELETE FROM casbin_rules WHERE
+        "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     v0 = $2 AND
                     v1 = $3 AND
@@ -90,7 +90,7 @@ pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -
 pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
     let rule = normalize_casbin_rule(rule, 0);
     sqlx::query!(
-        "DELETE FROM casbin_rules WHERE
+        "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     v0 = ? AND
                     v1 = ? AND
@@ -125,7 +125,7 @@ pub async fn remove_policies(
     for rule in rules {
         let rule = normalize_casbin_rule(rule, 0);
         sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     v0 = $2 AND
                     v1 = $3 AND
@@ -172,7 +172,7 @@ pub async fn remove_policies(
     for rule in rules {
         let rule = normalize_casbin_rule(rule, 0);
         sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     v0 = ? AND
                     v1 = ? AND
@@ -216,7 +216,7 @@ pub async fn remove_filtered_policy(
     let field_values = normalize_casbin_rule(field_values, field_index);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v5 is NULL OR v5 = $2)",
             pt.to_string(),
@@ -224,7 +224,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 4 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v4 is NULL OR v4 = $2) AND
                     (v5 is NULL OR v5 = $3)",
@@ -234,7 +234,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 3 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v3 is NULL OR v3 = $2) AND
                     (v4 is NULL OR v4 = $3) AND
@@ -246,7 +246,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 2 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v2 is NULL OR v2 = $2) AND
                     (v3 is NULL OR v3 = $3) AND
@@ -260,7 +260,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 1 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v1 is NULL OR v1 = $2) AND
                     (v2 is NULL OR v2 = $3) AND
@@ -276,7 +276,7 @@ pub async fn remove_filtered_policy(
         ))
     } else {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
                     (v0 is NULL OR v0 = $2) AND
                     (v1 is NULL OR v1 = $3) AND
@@ -311,7 +311,7 @@ pub async fn remove_filtered_policy(
     let field_values = normalize_casbin_rule(field_values, field_index);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v5 is NULL OR v5 = ?)",
             pt.to_string(),
@@ -319,7 +319,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 4 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v4 is NULL OR v4 = ?) AND
                     (v5 is NULL OR v5 = ?)",
@@ -329,7 +329,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 3 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v3 is NULL OR v3 = ?) AND
                     (v4 is NULL OR v4 = ?) AND
@@ -341,7 +341,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 2 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v2 is NULL OR v2 = ?) AND
                     (v3 is NULL OR v3 = ?) AND
@@ -355,7 +355,7 @@ pub async fn remove_filtered_policy(
         ))
     } else if field_index == 1 {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v1 is NULL OR v1 = ?) AND
                     (v2 is NULL OR v2 = ?) AND
@@ -371,7 +371,7 @@ pub async fn remove_filtered_policy(
         ))
     } else {
         Box::new(sqlx::query!(
-            "DELETE FROM casbin_rules WHERE
+            "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
                     (v0 is NULL OR v0 = ?) AND
                     (v1 is NULL OR v1 = ?) AND
@@ -398,22 +398,22 @@ pub async fn remove_filtered_policy(
 
 #[cfg(feature = "postgres")]
 pub(crate) async fn load_policy(conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
-    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rules")
+    let casbin_rule: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rule")
         .fetch_all(conn)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-    Ok(casbin_rules)
+    Ok(casbin_rule)
 }
 
 #[cfg(feature = "mysql")]
 pub(crate) async fn load_policy(conn: &ConnectionPool) -> Result<Vec<CasbinRule>> {
-    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rules")
+    let casbin_rule: Vec<CasbinRule> = sqlx::query_as!(CasbinRule, "SELECT * from  casbin_rule")
         .fetch_all(conn)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-    Ok(casbin_rules)
+    Ok(casbin_rule)
 }
 
 #[cfg(feature = "postgres")]
@@ -423,9 +423,9 @@ pub(crate) async fn load_filtered_policy<'a>(
 ) -> Result<Vec<CasbinRule>> {
     let (g_filter, p_filter) = filtered_where_values(filter);
 
-    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
+    let casbin_rule: Vec<CasbinRule> = sqlx::query_as!(
         CasbinRule,
-        "SELECT * from  casbin_rules WHERE (
+        "SELECT * from  casbin_rule WHERE (
             ptype LIKE 'g%' AND v0 LIKE $1 AND v1 LIKE $2 AND v2 LIKE $3 AND v3 LIKE $4 AND v4 LIKE $5 AND v5 LIKE $6 )
         OR (
             ptype LIKE 'p%' AND v0 LIKE $7 AND v1 LIKE $8 AND v2 LIKE $9 AND v3 LIKE $10 AND v4 LIKE $11 AND v5 LIKE $12 );
@@ -436,7 +436,7 @@ pub(crate) async fn load_filtered_policy<'a>(
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-    Ok(casbin_rules)
+    Ok(casbin_rule)
 }
 
 #[cfg(feature = "mysql")]
@@ -446,9 +446,9 @@ pub(crate) async fn load_filtered_policy<'a>(
 ) -> Result<Vec<CasbinRule>> {
     let (g_filter, p_filter) = filtered_where_values(filter);
 
-    let casbin_rules: Vec<CasbinRule> = sqlx::query_as!(
+    let casbin_rule: Vec<CasbinRule> = sqlx::query_as!(
         CasbinRule,
-        "SELECT * from  casbin_rules WHERE (
+        "SELECT * from  casbin_rule WHERE (
             ptype LIKE 'g%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? )
         OR (
             ptype LIKE 'p%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? );
@@ -460,7 +460,7 @@ pub(crate) async fn load_filtered_policy<'a>(
     .await
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
-    Ok(casbin_rules)
+    Ok(casbin_rule)
 }
 
 fn filtered_where_values<'a>(filter: &Filter<'a>) -> ([&'a str; 6], [&'a str; 6]) {
@@ -488,13 +488,13 @@ pub(crate) async fn save_policy(
         .begin()
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
-    sqlx::query!("DELETE FROM casbin_rules")
+    sqlx::query!("DELETE FROM casbin_rule")
         .execute(&mut transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
-            "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+            "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
             rule.ptype,
             rule.v0,
@@ -531,13 +531,13 @@ pub(crate) async fn save_policy<'a>(
         .begin()
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
-    sqlx::query!("DELETE FROM casbin_rules")
+    sqlx::query!("DELETE FROM casbin_rule")
         .execute(&mut transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
-            "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+            "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( ?, ?, ?, ?, ?, ?, ? )",
             rule.ptype,
             rule.v0,
@@ -568,7 +568,7 @@ pub(crate) async fn save_policy<'a>(
 #[cfg(feature = "postgres")]
 pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
-        "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+        "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
         rule.ptype,
         rule.v0,
@@ -589,7 +589,7 @@ pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -
 #[cfg(feature = "mysql")]
 pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -> Result<bool> {
     sqlx::query!(
-        "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+        "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( ?, ?, ?, ?, ?, ?, ? )",
         rule.ptype,
         rule.v0,
@@ -618,7 +618,7 @@ pub(crate) async fn add_policies(
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
-            "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+            "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
             rule.ptype,
             rule.v0,
@@ -657,7 +657,7 @@ pub(crate) async fn add_policies(
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
         sqlx::query!(
-            "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )
+            "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )
                  VALUES ( ?, ?, ?, ?, ?, ?, ? )",
             rule.ptype,
             rule.v0,
@@ -691,7 +691,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
         .begin()
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
-    sqlx::query!("DELETE FROM casbin_rules")
+    sqlx::query!("DELETE FROM casbin_rule")
         .execute(&mut transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
@@ -708,7 +708,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
         .begin()
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
-    sqlx::query!("DELETE FROM casbin_rules")
+    sqlx::query!("DELETE FROM casbin_rule")
         .execute(&mut transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;

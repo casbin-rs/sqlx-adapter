@@ -16,7 +16,7 @@ pub struct SqlxAdapter {
     is_filtered: bool,
 }
 
-//pub const TABLE_NAME: &str = "casbin_rules";
+//pub const TABLE_NAME: &str = "casbin_rule";
 
 impl<'a> SqlxAdapter {
     pub async fn new<U: Into<String>>(url: U, pool_size: u32) -> Result<Self> {
