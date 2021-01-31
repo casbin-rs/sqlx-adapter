@@ -49,7 +49,7 @@ jobs:
         run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
 
       - name: Create PostgresSQL Table
-        run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+        run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rule (
           id SERIAL PRIMARY KEY,
           ptype VARCHAR NOT NULL,
           v0 VARCHAR NOT NULL,
@@ -63,7 +63,7 @@ jobs:
 
       - name: Create MySQL Table
         run: |
-          mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rules (
+          mysql -ucasbin_rs -pcasbin_rs --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -e "USE casbin; CREATE TABLE IF NOT EXISTS casbin_rule (
             id INT NOT NULL AUTO_INCREMENT,
             ptype VARCHAR(12) NOT NULL,
             v0 VARCHAR(128) NOT NULL,

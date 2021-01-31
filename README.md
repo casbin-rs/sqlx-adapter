@@ -13,13 +13,21 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 - [Mysql](https://www.mysql.com/)
 - [Postgres](https://github.com/lib/pq)
 
+## Notice
+In order to unify the database table name in Casbin ecosystem, we decide to use `casbin_rule` instead of `casbin_rules` from version `0.4.0`. If you are using old version `sqlx-adapter` in your production environment, please use following command and update `sqlx-adapter` version:
+
+````SQL
+# MySQL & PostgreSQL
+ALTER TABLE casbin_rules RENAME TO casbin_rule;
+````
+
 ## Install
 
 Add it to `Cargo.toml`
 
 ```rust
 sqlx-adapter = { version = "0.3.0", features = ["postgres"] }
-async-std = "1.6.4"
+tokio = "0.2.24"
 ```
 
 ## Configure
@@ -80,11 +88,11 @@ async-std = "1.6.4"
 
     ```
 
-2. Create table `casbin_rules`
+2. Create table `casbin_rule`
 
     ```bash
     # PostgreSQL
-    psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rules (
+    psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rule (
         id SERIAL PRIMARY KEY,
         ptype VARCHAR NOT NULL,
         v0 VARCHAR NOT NULL,
@@ -99,7 +107,7 @@ async-std = "1.6.4"
     # MySQL
     mysql -h 127.0.0.1 -u casbin_rs -pcasbin_rs casbin 
 
-    CREATE TABLE IF NOT EXISTS casbin_rules (
+    CREATE TABLE IF NOT EXISTS casbin_rule (
         id INT NOT NULL AUTO_INCREMENT,
         ptype VARCHAR(12) NOT NULL,
         v0 VARCHAR(128) NOT NULL,
