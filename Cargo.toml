@@ -16,7 +16,7 @@ dotenv = { version = "0.15.0", default-features = false }
 # Force tokio version at 0.2.x until sqlx is updated
 tokio = { version = "0.2.24", default-features = false, optional = true }
 async-std = { version = "1.9.0", default-features = false, optional = true }
-actix-rt = { version = "1.1.1", default-features = false, optional = true }
+actix-rt = { version = "2.0.0", default-features = false, optional = true }
 
 [features]
 default = ["postgres", "runtime-tokio-native-tls", "offline"]
@@ -43,4 +43,4 @@ offline = ["sqlx/offline"]
 async-std = { version = "1.9.0", features = [ "attributes" ] }
 # Force tokio version at 0.2.x until sqlx is updated
 tokio = { version = "0.2.24", features = [ "full" ] }
-actix-rt = { version = "1.1.1" }
+actix-rt = { version = "2.0.0" }
