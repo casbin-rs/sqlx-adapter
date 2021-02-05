@@ -28,9 +28,9 @@ Add it to `Cargo.toml`
 ```rust
 sqlx-adapter = { version = "0.4.0", features = ["postgres"] }
 tokio = "1.1.1"
+```
 
 **Warning**: `tokio v1.0` or later is supported from `sqlx-adapter v0.4.0`, we recommend that you upgrade the relevant components to ensure that they work properly. The last version that supports `tokio v0.2` is `diesel-adapter v0.3.0` , you can choose according to your needs.
-```
 
 ## Configure
 

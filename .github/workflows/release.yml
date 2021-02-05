@@ -32,6 +32,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
+          args: --no-verify
 
       - name: GitHub Release
         id: create_release
