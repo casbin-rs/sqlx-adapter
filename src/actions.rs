@@ -2,15 +2,15 @@
 #![allow(clippy::toplevel_ref_arg)]
 use crate::Error;
 use casbin::{error::AdapterError, Error as CasbinError, Filter, Result};
-use sqlx::{error::Error as SqlxError, Done};
+use sqlx::error::Error as SqlxError;
 
 use crate::models::{CasbinRule, NewCasbinRule};
 
 #[cfg(feature = "postgres")]
-use sqlx::postgres::PgDone;
+use sqlx::postgres::PgQueryResult;
 
 #[cfg(feature = "mysql")]
-use sqlx::mysql::MySqlDone;
+use sqlx::mysql::MySqlQueryResult;
 
 #[cfg(feature = "postgres")]
 pub type ConnectionPool = sqlx::PgPool;
@@ -19,7 +19,7 @@ pub type ConnectionPool = sqlx::PgPool;
 pub type ConnectionPool = sqlx::MySqlPool;
 
 #[cfg(feature = "postgres")]
-pub async fn new(conn: &ConnectionPool) -> Result<PgDone> {
+pub async fn new(conn: &ConnectionPool) -> Result<PgQueryResult> {
     sqlx::query!(
         "CREATE TABLE IF NOT EXISTS casbin_rule (
                     id SERIAL PRIMARY KEY,
@@ -40,7 +40,7 @@ pub async fn new(conn: &ConnectionPool) -> Result<PgDone> {
 }
 
 #[cfg(feature = "mysql")]
-pub async fn new(conn: &ConnectionPool) -> Result<MySqlDone> {
+pub async fn new(conn: &ConnectionPool) -> Result<MySqlQueryResult> {
     sqlx::query!(
         "CREATE TABLE IF NOT EXISTS casbin_rule (
                     id INT NOT NULL AUTO_INCREMENT,
@@ -82,7 +82,7 @@ pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -
     )
     .execute(conn)
     .await
-    .map(|n| Done::rows_affected(&n) == 1)
+    .map(|n| PgQueryResult::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -108,7 +108,7 @@ pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -
     )
     .execute(conn)
     .await
-    .map(|n| Done::rows_affected(&n) == 1)
+    .map(|n| MySqlQueryResult::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -144,7 +144,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if PgQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -191,7 +191,7 @@ pub async fn remove_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if MySqlQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -297,7 +297,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(conn)
         .await
-        .map(|n| Done::rows_affected(&n) >= 1)
+        .map(|n| PgQueryResult::rows_affected(&n) >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -392,7 +392,7 @@ pub async fn remove_filtered_policy(
     boxed_query
         .execute(conn)
         .await
-        .map(|n| Done::rows_affected(&n) >= 1)
+        .map(|n| MySqlQueryResult::rows_affected(&n) >= 1)
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))
 }
 
@@ -507,7 +507,7 @@ pub(crate) async fn save_policy(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if PgQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -550,7 +550,7 @@ pub(crate) async fn save_policy<'a>(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if MySqlQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -580,7 +580,7 @@ pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -
     )
     .execute(conn)
     .await
-    .map(|n| Done::rows_affected(&n) == 1)
+    .map(|n| PgQueryResult::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
@@ -601,7 +601,7 @@ pub(crate) async fn add_policy(conn: &ConnectionPool, rule: NewCasbinRule<'_>) -
     )
     .execute(conn)
     .await
-    .map(|n| Done::rows_affected(&n) == 1)
+    .map(|n| MySqlQueryResult::rows_affected(&n) == 1)
     .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
 
     Ok(true)
@@ -631,7 +631,7 @@ pub(crate) async fn add_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if PgQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
@@ -670,7 +670,7 @@ pub(crate) async fn add_policies(
         .execute(&mut transaction)
         .await
         .and_then(|n| {
-            if Done::rows_affected(&n) == 1 {
+            if MySqlQueryResult::rows_affected(&n) == 1 {
                 Ok(true)
             } else {
                 Err(SqlxError::RowNotFound)
