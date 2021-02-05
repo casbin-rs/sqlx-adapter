@@ -23,7 +23,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:8.0
+        image: mariadb
         env:
           MYSQL_DATABASE: casbin
           MYSQL_USER: casbin_rs
