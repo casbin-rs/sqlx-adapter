@@ -45,8 +45,12 @@ jobs:
           components: rustfmt, clippy
           override: true
 
-      - name: Install PostgreSQL & MySQL Dependencies
-        run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev
+      - name: Install PostgreSQL & MySQL & SQLite Dependencies
+        run: sudo apt-get install libpq-dev postgresql-client mysql-client libmysqlclient-dev libsqlite3-dev sqlite3
+
+      - name: Create SQLite DB
+        run: |
+          touch casbin.db
 
       - name: Create PostgresSQL Table
         run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rule (
@@ -75,6 +79,20 @@ jobs:
             PRIMARY KEY(id),
             CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+
+      - name: Create SQLite Table
+        run: |
+          sqlite3 casbin.db -cmd "CREATE TABLE IF NOT EXISTS casbin_rule (
+            id INTEGER PRIMARY KEY,
+            ptype VARCHAR(12) NOT NULL,
+            v0 VARCHAR(128) NOT NULL,
+            v1 VARCHAR(128) NOT NULL,
+            v2 VARCHAR(128) NOT NULL,
+            v3 VARCHAR(128) NOT NULL,
+            v4 VARCHAR(128) NOT NULL,
+            v5 VARCHAR(128) NOT NULL,
+            CONSTRAINT unique_key_diesel_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+            );"
 
       - name: Cargo Build
         uses: actions-rs/cargo@v1
@@ -184,6 +202,58 @@ jobs:
         with:
           command: test
           args: --no-default-features --features mysql,runtime-actix-rustls
+
+      #SQLite
+      #async-std
+      - name: Cargo Test For SQLite,runtime-async-std-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-async-std-native-tls
+
+      - name: Cargo Test For SQLite,runtime-async-std-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-async-std-rustls
+
+      # tokio
+      - name: Cargo Test For SQLite,runtime-tokio-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-tokio-native-tls
+
+      - name: Cargo Test For SQLite,runtime-tokio-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-tokio-rustls
+
+      # actix
+      - name: Cargo Test For SQLite,runtime-actix-native-tls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-actix-native-tls
+
+      - name: Cargo Test For SQLite,runtime-actix-rustls
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: sqlite:casbin.db
+        with:
+          command: test
+          args: --no-default-features --features sqlite,runtime-actix-rustls
 
       - name: Cargo Clippy
         uses: actions-rs/cargo@v1

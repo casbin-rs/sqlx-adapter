@@ -12,12 +12,13 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 
 - [Mysql](https://www.mysql.com/)
 - [Postgres](https://github.com/lib/pq)
+- [SQLite](https://www.sqlite.org)
 
 ## Notice
 In order to unify the database table name in Casbin ecosystem, we decide to use `casbin_rule` instead of `casbin_rules` from version `0.4.0`. If you are using old version `sqlx-adapter` in your production environment, please use following command and update `sqlx-adapter` version:
 
 ````SQL
-# MySQL & PostgreSQL
+# MySQL & PostgreSQL & SQLite
 ALTER TABLE casbin_rules RENAME TO casbin_rule;
 ````
 
@@ -26,7 +27,7 @@ ALTER TABLE casbin_rules RENAME TO casbin_rule;
 Add it to `Cargo.toml`
 
 ```rust
-sqlx-adapter = { version = "0.4.0", features = ["postgres"] }
+sqlx-adapter = { version = "0.4.1, features = ["postgres"] }
 tokio = "1.1.1"
 ```
 
@@ -121,6 +122,21 @@ tokio = "1.1.1"
         PRIMARY KEY(id),
         CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+   
+   # SQLite
+   touch casbin.db
+   
+   sqlite3 casbin.db -cmd "CREATE TABLE IF NOT EXISTS casbin_rule (
+       id INTEGER PRIMARY KEY,
+       ptype VARCHAR(12) NOT NULL,
+       v0 VARCHAR(128) NOT NULL,
+       v1 VARCHAR(128) NOT NULL,
+       v2 VARCHAR(128) NOT NULL,
+       v3 VARCHAR(128) NOT NULL,
+       v4 VARCHAR(128) NOT NULL,
+       v5 VARCHAR(128) NOT NULL,
+       CONSTRAINT unique_key_diesel_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+       );"
     ```
 
 3. Configure `env`
@@ -130,6 +146,7 @@ tokio = "1.1.1"
     ```bash
     DATABASE_URL=postgres://casbin_rs:casbin_rs@localhost:5432/casbin
     # DATABASE_URL=mysql://casbin_rs:casbin_rs@localhost:3306/casbin
+    # DATABASE_URL=sqlite:casbin.db
     POOL_SIZE=8
     ```
 
@@ -164,5 +181,6 @@ async fn main() -> Result<()> {
 
 - `postgres`
 - `mysql`
+- `sqlite`
 
-*Attention*: `postgres` and `mysql` are mutual exclusive which means that you can only activate one of them. Currently we don't have support for `sqlite`, it may be added in the near future.
+*Attention*: `postgres`, `mysql`, `sqlite` are mutual exclusive which means that you can only activate one of them.

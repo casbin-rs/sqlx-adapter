@@ -33,24 +33,6 @@
       "nullable": []
     }
   },
-  "1c537ffe298e5ddfe1bac7de2bf766d3972f25a291ea209c2986f0e115492107": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    v0 = $2 AND\n                    v1 = $3 AND\n                    v2 = $4 AND\n                    v3 = $5 AND\n                    v4 = $6 AND\n                    v5 = $7",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "1cabd2f674da323da9e0da724d3bcfe5f968b31500e8c8cf97fe16814bc04164": {
     "query": "INSERT INTO casbin_rule ( ptype, v0, v1, v2, v3, v4, v5 )\n                 VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
     "describe": {
@@ -65,16 +47,6 @@
           "Varchar",
           "Varchar"
         ]
-      },
-      "nullable": []
-    }
-  },
-  "23979802964d554b7ff1b4b542a6d82a387220ec98d38f7ddd3c6f57f7131c5f": {
-    "query": "DELETE FROM casbin_rules",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": []
       },
       "nullable": []
     }
@@ -107,37 +79,8 @@
       "nullable": []
     }
   },
-  "293a0befd8351c43ddeabf088ae31e78ff622a2fadaab892cd23a6b40be05c5d": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v5 is NULL OR v5 = $2)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "35268ff6cd479198a474dfdf8d718257d7ce802c0530e902236df0eed0f9f491": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v2 is NULL OR v2 = $2) AND\n                    (v3 is NULL OR v3 = $3) AND\n                    (v4 is NULL OR v4 = $4) AND\n                    (v5 is NULL OR v5 = $5)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "367ccfe8d50c062176e1654de3223a51cf50c0a723c3237ff7c5c1df6d23999f": {
-    "query": "SELECT * from  casbin_rule",
+  "3022cb733970ae5836ab3891367b209a7e1f0974242ecd0f55e5b0098152bad5": {
+    "query": "SELECT * FROM casbin_rule",
     "describe": {
       "columns": [
         {
@@ -194,21 +137,6 @@
         false,
         false
       ]
-    }
-  },
-  "3f2f2a7f8c537025eb08f92e25ae14a6814638e58f3137e4f4c89b88b6fe99b1": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v3 is NULL OR v3 = $2) AND\n                    (v4 is NULL OR v4 = $3) AND\n                    (v5 is NULL OR v5 = $4)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
     }
   },
   "438ee38e669be96e562d09d3bc5806b4c78b7aa2a9609c4eccb941c7dff7b107": {
@@ -232,79 +160,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "5745536562311fe2f28b6f5ad7cd10021ffa627eff6e464945199e354d50a256": {
-    "query": "SELECT * from  casbin_rules WHERE (\n            ptype LIKE 'g%' AND v0 LIKE $1 AND v1 LIKE $2 AND v2 LIKE $3 AND v3 LIKE $4 AND v4 LIKE $5 AND v5 LIKE $6 )\n        OR (\n            ptype LIKE 'p%' AND v0 LIKE $7 AND v1 LIKE $8 AND v2 LIKE $9 AND v3 LIKE $10 AND v4 LIKE $11 AND v5 LIKE $12 );\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "ptype",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "v0",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "v1",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "v2",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "v3",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "v4",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "v5",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
     }
   },
   "607b617f24e2032cf89b9550130a5358d8263e92c789d9f6c2f47b235b5b5903": {
@@ -340,114 +195,12 @@
       "nullable": []
     }
   },
-  "a9d5cf1bac5ea352dea5a99d276a076974a56d4c56c172bbe829eb8ae8789e80": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v4 is NULL OR v4 = $2) AND\n                    (v5 is NULL OR v5 = $3)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "b9159d75441b89fe542ee5eaa142af890d91ac2c279343fb6467b62183e4c11e": {
-    "query": "SELECT * from  casbin_rules",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "ptype",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "v0",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "v1",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "v2",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "v3",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "v4",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "v5",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "b91e273693cfaead6884d42e906ead1a1de7bbc4019a6e151b2e3bef84aa4889": {
     "query": "DELETE FROM casbin_rule WHERE\n                    ptype = $1 AND\n                    (v4 is NULL OR v4 = $2) AND\n                    (v5 is NULL OR v5 = $3)",
     "describe": {
       "columns": [],
       "parameters": {
         "Left": [
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "bc990d1fd2efa18e75b3bb2ab2687c8de3a87e638a3ae110c827bf4c082b0bc3": {
-    "query": "CREATE TABLE IF NOT EXISTS casbin_rules (\n                    id SERIAL PRIMARY KEY,\n                    ptype VARCHAR NOT NULL,\n                    v0 VARCHAR NOT NULL,\n                    v1 VARCHAR NOT NULL,\n                    v2 VARCHAR NOT NULL,\n                    v3 VARCHAR NOT NULL,\n                    v4 VARCHAR NOT NULL,\n                    v5 VARCHAR NOT NULL,\n                    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)\n                    );\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": []
-    }
-  },
-  "f02c45706938777d6436eec2c4315b59e67830de5f7257fde27c45faeebc3923": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v0 is NULL OR v0 = $2) AND\n                    (v1 is NULL OR v1 = $3) AND\n                    (v2 is NULL OR v2 = $4) AND\n                    (v3 is NULL OR v3 = $5) AND\n                    (v4 is NULL OR v4 = $6) AND\n                    (v5 is NULL OR v5 = $7)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text",
           "Text",
           "Text",
           "Text"
@@ -527,41 +280,6 @@
         false,
         false
       ]
-    }
-  },
-  "fc84821aa81eb40bdc0a06a0826868ee0439856350bd0d380b7f6c8d847efa04": {
-    "query": "INSERT INTO casbin_rules ( ptype, v0, v1, v2, v3, v4, v5 )\n                 VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "fe59b72be724019f88a7c8c01a658a86ceb16735560aaffa5b0f12db259fcd5f": {
-    "query": "DELETE FROM casbin_rules WHERE\n                    ptype = $1 AND\n                    (v1 is NULL OR v1 = $2) AND\n                    (v2 is NULL OR v2 = $3) AND\n                    (v3 is NULL OR v3 = $4) AND\n                    (v4 is NULL OR v4 = $5) AND\n                    (v5 is NULL OR v5 = $6)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": []
     }
   }
 }

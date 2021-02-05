@@ -10,6 +10,8 @@ use crate::actions as adapter;
 use sqlx::mysql::MySqlPoolOptions;
 #[cfg(feature = "postgres")]
 use sqlx::postgres::PgPoolOptions;
+#[cfg(feature = "sqlite")]
+use sqlx::sqlite::SqlitePoolOptions;
 
 pub struct SqlxAdapter {
     pool: adapter::ConnectionPool,
@@ -31,6 +33,13 @@ impl<'a> SqlxAdapter {
 
         #[cfg(feature = "mysql")]
         let pool = MySqlPoolOptions::new()
+            .max_connections(pool_size)
+            .connect(&url.into())
+            .await
+            .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
+
+        #[cfg(feature = "sqlite")]
+        let pool = SqlitePoolOptions::new()
             .max_connections(pool_size)
             .connect(&url.into())
             .await
@@ -263,7 +272,7 @@ mod tests {
     )]
     #[cfg_attr(
         any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
-        tokio::test
+        tokio::test(flavor = "multi_thread")
     )]
     #[cfg_attr(
         any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
@@ -290,6 +299,11 @@ mod tests {
                     .await
                     .unwrap()
             }
+
+            #[cfg(feature = "sqlite")]
+            {
+                SqlxAdapter::new("sqlite:casbin.db", 8).await.unwrap()
+            }
         };
 
         assert!(Enforcer::new(m, adapter).await.is_ok());
@@ -304,7 +318,7 @@ mod tests {
     )]
     #[cfg_attr(
         any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
-        tokio::test
+        tokio::test(flavor = "multi_thread")
     )]
     #[cfg_attr(
         any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
@@ -333,6 +347,11 @@ mod tests {
                 SqlxAdapter::new("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin", 8)
                     .await
                     .unwrap()
+            }
+
+            #[cfg(feature = "sqlite")]
+            {
+                SqlxAdapter::new("sqlite:casbin.db", 8).await.unwrap()
             }
         };
 
