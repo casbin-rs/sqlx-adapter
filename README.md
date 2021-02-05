@@ -148,7 +148,7 @@ use sqlx_adapter::casbin::prelude::*;
 use sqlx_adapter::casbin::Result;
 use sqlx_adapter::SqlxAdapter;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<()> {
     let m = DefaultModel::from_file("examples/rbac_model.conf").await?;
     
