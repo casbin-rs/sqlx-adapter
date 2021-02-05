@@ -1,8 +1,22 @@
 use sqlx::FromRow;
 
+#[cfg(any(feature = "postgres", feature = "mysql"))]
 #[derive(Debug, FromRow)]
 pub(crate) struct CasbinRule {
     pub id: i32,
+    pub ptype: String,
+    pub v0: String,
+    pub v1: String,
+    pub v2: String,
+    pub v3: String,
+    pub v4: String,
+    pub v5: String,
+}
+
+#[cfg(feature = "sqlite")]
+#[derive(Debug, FromRow)]
+pub(crate) struct CasbinRule {
+    pub id: i64,
     pub ptype: String,
     pub v0: String,
     pub v1: String,

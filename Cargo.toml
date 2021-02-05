@@ -23,6 +23,7 @@ default = ["postgres", "runtime-tokio-native-tls", "offline"]
 #databases
 postgres = ["sqlx/postgres"]
 mysql = ["sqlx/mysql"]
+sqlite = ["sqlx/sqlite"]
 
 # async runtime
 # async-std

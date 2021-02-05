@@ -3,3 +3,6 @@
 .idea/
 Cargo.lock
 .DS_Store
+*.db
+*.db-wal
+*.db-shm
