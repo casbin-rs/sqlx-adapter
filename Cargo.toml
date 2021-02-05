@@ -9,14 +9,13 @@ homepage= "https://github.com/casbin-rs/sqlx-adapter"
 readme= "README.md"
 
 [dependencies]
-casbin = { version = "=2.0.5", default-features = false }
-sqlx = { version = "0.4.2", default-features = false, features = [ "macros" ] }
+casbin = { version = "2.0.6", default-features = false }
+sqlx = { version = "0.5.1", default-features = false, features = [ "macros" ] }
 async-trait = "0.1.42"
 dotenv = { version = "0.15.0", default-features = false }
-# Force tokio version at 0.2.x until sqlx is updated
-tokio = { version = "0.2.24", default-features = false, optional = true }
+tokio = { version = "1.1.1", default-features = false, optional = true }
 async-std = { version = "1.9.0", default-features = false, optional = true }
-actix-rt = { version = "1.1.1", default-features = false, optional = true }
+actix-rt = { version = "2.0.0", default-features = false, optional = true }
 
 [features]
 default = ["postgres", "runtime-tokio-native-tls", "offline"]
@@ -41,6 +40,5 @@ offline = ["sqlx/offline"]
 
 [dev-dependencies]
 async-std = { version = "1.9.0", features = [ "attributes" ] }
-# Force tokio version at 0.2.x until sqlx is updated
-tokio = { version = "0.2.24", features = [ "full" ] }
-actix-rt = { version = "1.1.1" }
+tokio = { version = "1.1.1", features = [ "full" ] }
+actix-rt = { version = "2.0.0" }
