@@ -51,6 +51,13 @@ impl<'a> SqlxAdapter {
         })
     }
 
+    pub async fn new_with_pool(pool: adapter::ConnectionPool) -> Result<Self> {
+        adapter::new(&pool).await.map(|_| Self {
+            pool,
+            is_filtered: false,
+        })
+    }
+
     pub(crate) fn save_policy_line(
         &self,
         ptype: &'a str,
@@ -305,6 +312,61 @@ mod tests {
                 SqlxAdapter::new("sqlite:casbin.db", 8).await.unwrap()
             }
         };
+
+        assert!(Enforcer::new(m, adapter).await.is_ok());
+    }
+
+    #[cfg_attr(
+        any(
+            feature = "runtime-async-std-native-tls",
+            feature = "runtime-async-std-rustls"
+        ),
+        async_std::test
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
+        tokio::test(flavor = "multi_thread")
+    )]
+    #[cfg_attr(
+        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
+        actix_rt::test
+    )]
+    async fn test_create_with_pool() {
+        use casbin::prelude::*;
+
+        let m = DefaultModel::from_file("examples/rbac_model.conf")
+            .await
+            .unwrap();
+        let pool = {
+            #[cfg(feature = "postgres")]
+            {
+                PgPoolOptions::new()
+                    .max_connections(8)
+                    .connect("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin")
+                    .await
+                    .unwrap()
+            }
+
+            #[cfg(feature = "mysql")]
+            {
+                MySqlPoolOptions::new()
+                    .max_connections(8)
+                    .connect("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin")
+                    .await
+                    .unwrap()
+            }
+
+            #[cfg(feature = "sqlite")]
+            {
+                SqlitePoolOptions::new()
+                    .max_connections(8)
+                    .connect("sqlite:casbin.db")
+                    .await
+                    .unwrap()
+            }
+        };
+
+        let adapter = SqlxAdapter::new_with_pool(pool).await.unwrap();
 
         assert!(Enforcer::new(m, adapter).await.is_ok());
     }
