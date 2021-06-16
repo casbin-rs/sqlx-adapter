@@ -56,7 +56,7 @@ jobs:
         env:
           DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
         with:
-          args: --out Xml
+          args: --avoid-cfg-tarpaulin --out Xml
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v1
