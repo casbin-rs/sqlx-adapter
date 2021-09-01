@@ -1,6 +1,10 @@
 use async_trait::async_trait;
 use casbin::{error::AdapterError, Adapter, Error as CasbinError, Filter, Model, Result};
 use dotenv::dotenv;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 
 use crate::{error::*, models::*};
 
@@ -13,9 +17,10 @@ use sqlx::postgres::PgPoolOptions;
 #[cfg(feature = "sqlite")]
 use sqlx::sqlite::SqlitePoolOptions;
 
+#[derive(Clone)]
 pub struct SqlxAdapter {
     pool: adapter::ConnectionPool,
-    is_filtered: bool,
+    is_filtered: Arc<AtomicBool>,
 }
 
 //pub const TABLE_NAME: &str = "casbin_rule";
@@ -47,14 +52,14 @@ impl<'a> SqlxAdapter {
 
         adapter::new(&pool).await.map(|_| Self {
             pool,
-            is_filtered: false,
+            is_filtered: Arc::new(AtomicBool::new(false)),
         })
     }
 
     pub async fn new_with_pool(pool: adapter::ConnectionPool) -> Result<Self> {
         adapter::new(&pool).await.map(|_| Self {
             pool,
-            is_filtered: false,
+            is_filtered: Arc::new(AtomicBool::new(false)),
         })
     }
 
@@ -160,7 +165,7 @@ impl Adapter for SqlxAdapter {
 
     async fn load_filtered_policy<'a>(&mut self, m: &mut dyn Model, f: Filter<'a>) -> Result<()> {
         let rules = adapter::load_filtered_policy(&self.pool, &f).await?;
-        self.is_filtered = true;
+        self.is_filtered.store(true, Ordering::SeqCst);
 
         for casbin_rule in &rules {
             if let Some(policy) = self.normalize_policy(casbin_rule) {
@@ -258,7 +263,7 @@ impl Adapter for SqlxAdapter {
     }
 
     fn is_filtered(&self) -> bool {
-        self.is_filtered
+        self.is_filtered.load(Ordering::SeqCst)
     }
 }
 
