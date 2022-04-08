@@ -89,7 +89,7 @@ pub async fn new(conn: &ConnectionPool) -> Result<MySqlQueryResult> {
 
 #[cfg(feature = "postgres")]
 pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
-    let rule = normalize_casbin_rule(rule, 0);
+    let rule = normalize_casbin_rule(rule);
     sqlx::query!(
         "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
@@ -115,7 +115,7 @@ pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -
 
 #[cfg(feature = "sqlite")]
 pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
-    let rule = normalize_casbin_rule(rule, 0);
+    let rule = normalize_casbin_rule(rule);
     sqlx::query!(
         "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
@@ -141,7 +141,7 @@ pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -
 
 #[cfg(feature = "mysql")]
 pub async fn remove_policy(conn: &ConnectionPool, pt: &str, rule: Vec<String>) -> Result<bool> {
-    let rule = normalize_casbin_rule(rule, 0);
+    let rule = normalize_casbin_rule(rule);
     sqlx::query!(
         "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
@@ -176,7 +176,7 @@ pub async fn remove_policies(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
-        let rule = normalize_casbin_rule(rule, 0);
+        let rule = normalize_casbin_rule(rule);
         sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
@@ -223,7 +223,7 @@ pub async fn remove_policies(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
-        let rule = normalize_casbin_rule(rule, 0);
+        let rule = normalize_casbin_rule(rule);
         sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
@@ -270,7 +270,7 @@ pub async fn remove_policies(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
-        let rule = normalize_casbin_rule(rule, 0);
+        let rule = normalize_casbin_rule(rule);
         sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
@@ -313,7 +313,7 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values, field_index);
+    let field_values = normalize_casbin_rule(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
@@ -408,7 +408,7 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values, field_index);
+    let field_values = normalize_casbin_rule(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
@@ -503,7 +503,7 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values, field_index);
+    let field_values = normalize_casbin_rule(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
@@ -1067,7 +1067,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
     Ok(())
 }
 
-fn normalize_casbin_rule(mut rule: Vec<String>, field_index: usize) -> Vec<String> {
-    rule.resize(6 - field_index, String::from(""));
+fn normalize_casbin_rule(mut rule: Vec<String>) -> Vec<String> {
+    rule.resize(6, String::new());
     rule
 }
