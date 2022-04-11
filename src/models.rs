@@ -1,5 +1,6 @@
 use sqlx::FromRow;
 
+#[allow(dead_code)]
 #[cfg(any(feature = "postgres", feature = "mysql"))]
 #[derive(Debug, FromRow)]
 pub(crate) struct CasbinRule {
