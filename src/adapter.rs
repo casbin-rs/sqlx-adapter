@@ -546,7 +546,8 @@ mod tests {
 
         assert!(adapter
             .remove_filtered_policy("", "g", 0, to_owned(vec!["alice", "data2_admin"]))
-            .await.unwrap());
+            .await
+            .unwrap());
 
         assert!(adapter
             .add_policy(
