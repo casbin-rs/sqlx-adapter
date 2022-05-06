@@ -14,6 +14,7 @@ pub(crate) struct CasbinRule {
     pub v5: String,
 }
 
+#[allow(dead_code)]
 #[cfg(feature = "sqlite")]
 #[derive(Debug, FromRow)]
 pub(crate) struct CasbinRule {
