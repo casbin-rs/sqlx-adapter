@@ -300,14 +300,14 @@ mod tests {
         let adapter = {
             #[cfg(feature = "postgres")]
             {
-                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin", 8)
+                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@localhost:5432/casbin", 8)
                     .await
                     .unwrap()
             }
 
             #[cfg(feature = "mysql")]
             {
-                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin", 8)
+                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@localhost:3306/casbin", 8)
                     .await
                     .unwrap()
             }
@@ -347,7 +347,7 @@ mod tests {
             {
                 PgPoolOptions::new()
                     .max_connections(8)
-                    .connect("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin")
+                    .connect("postgres://casbin_rs:casbin_rs@localhost:5432/casbin")
                     .await
                     .unwrap()
             }
@@ -356,7 +356,7 @@ mod tests {
             {
                 MySqlPoolOptions::new()
                     .max_connections(8)
-                    .connect("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin")
+                    .connect("mysql://casbin_rs:casbin_rs@localhost:3306/casbin")
                     .await
                     .unwrap()
             }
@@ -404,14 +404,14 @@ mod tests {
         let mut adapter = {
             #[cfg(feature = "postgres")]
             {
-                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin", 8)
+                SqlxAdapter::new("postgres://casbin_rs:casbin_rs@localhost:5432/casbin", 8)
                     .await
                     .unwrap()
             }
 
             #[cfg(feature = "mysql")]
             {
-                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@127.0.0.1:3306/casbin", 8)
+                SqlxAdapter::new("mysql://casbin_rs:casbin_rs@localhost:3306/casbin", 8)
                     .await
                     .unwrap()
             }
