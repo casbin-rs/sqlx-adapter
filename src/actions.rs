@@ -1073,7 +1073,10 @@ fn normalize_casbin_rule(mut rule: Vec<String>) -> Vec<String> {
 }
 
 fn normalize_casbin_rule_option(rule: Vec<String>) -> Vec<Option<String>> {
-    let mut rule_with_option = rule.iter().map(|x|Some(x.clone())).collect::<Vec<Option<String>>>();
+    let mut rule_with_option = rule
+        .iter()
+        .map(|x| Some(x.clone()))
+        .collect::<Vec<Option<String>>>();
     rule_with_option.resize(6, None);
     rule_with_option
 }

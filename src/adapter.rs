@@ -569,26 +569,14 @@ mod tests {
 
         // GitHub issue: https://github.com/casbin-rs/sqlx-adapter/issues/64
         assert!(adapter
-            .add_policy(
-                "",
-                "g",
-                to_owned(vec!["carol", "data1_admin"]),
-            )
+            .add_policy("", "g", to_owned(vec!["carol", "data1_admin"]),)
             .await
             .is_ok());
         assert!(adapter
-            .remove_filtered_policy(
-                "",
-                "g",
-                0,
-                to_owned(vec!["carol"]),
-            )
+            .remove_filtered_policy("", "g", 0, to_owned(vec!["carol"]),)
             .await
             .unwrap());
-        assert_eq!(
-            vec![String::new(); 0],
-            e.get_roles_for_user("carol", None)
-        );
+        assert_eq!(vec![String::new(); 0], e.get_roles_for_user("carol", None));
 
         // shadow the previous enforcer
         let mut e = Enforcer::new(
