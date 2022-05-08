@@ -251,7 +251,7 @@ impl Adapter for SqlxAdapter {
         field_index: usize,
         field_values: Vec<String>,
     ) -> Result<bool> {
-        if field_index <= 5 && !field_values.is_empty() && field_values.len() >= 6 - field_index {
+        if field_index <= 5 && !field_values.is_empty() && field_values.len() > field_index {
             adapter::remove_filtered_policy(&self.pool, pt, field_index, field_values).await
         } else {
             Ok(false)
@@ -427,7 +427,7 @@ mod tests {
         assert!(adapter
             .remove_policy("", "p", to_owned(vec!["alice", "data1", "read"]))
             .await
-            .is_ok());
+            .unwrap());
         assert!(adapter
             .remove_policy("", "p", to_owned(vec!["bob", "data2", "write"]))
             .await
@@ -547,7 +547,7 @@ mod tests {
         assert!(adapter
             .remove_filtered_policy("", "g", 0, to_owned(vec!["alice", "data2_admin"]))
             .await
-            .is_ok());
+            .unwrap());
 
         assert!(adapter
             .add_policy(
