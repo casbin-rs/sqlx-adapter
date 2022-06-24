@@ -27,8 +27,8 @@ ALTER TABLE casbin_rules RENAME TO casbin_rule;
 Add it to `Cargo.toml`
 
 ```rust
-sqlx-adapter = { version = "0.4.1, features = ["postgres"] }
-tokio = "1.1.1"
+sqlx-adapter = { version = "0.4.2, features = ["postgres"] }
+tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
 **Warning**: `tokio v1.0` or later is supported from `sqlx-adapter v0.4.0`, we recommend that you upgrade the relevant components to ensure that they work properly. The last version that supports `tokio v0.2` is `sqlx-adapter v0.3.0` , you can choose according to your needs.
