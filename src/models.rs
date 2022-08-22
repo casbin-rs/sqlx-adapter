@@ -38,3 +38,4 @@ pub(crate) struct NewCasbinRule<'a> {
     pub v4: &'a str,
     pub v5: &'a str,
 }
+
