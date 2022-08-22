@@ -36,7 +36,7 @@ jobs:
           override: true
       
       - name: Install PostgreSQL Dependencies
-        run: sudo apt-get install libpq-dev postgresql-client
+        run: sudo apt-get install libpq-dev postgresql-client --fix-missing
   
       - name: Create Table
         run: psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rule (
