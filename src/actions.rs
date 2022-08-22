@@ -313,77 +313,77 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values);
+    let field_values = normalize_casbin_rule_option(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v5 is NULL OR v5 = $2)",
+                    (v5 is NULL OR v5 = COALESCE($2,v5))",
             pt.to_string(),
-            field_values[5]
+            field_values[0]
         ))
     } else if field_index == 4 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v4 is NULL OR v4 = $2) AND
-                    (v5 is NULL OR v5 = $3)",
+                    (v4 is NULL OR v4 = COALESCE($2,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE($3,v5))",
             pt,
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1]
         ))
     } else if field_index == 3 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v3 is NULL OR v3 = $2) AND
-                    (v4 is NULL OR v4 = $3) AND
-                    (v5 is NULL OR v5 = $4)",
+                    (v3 is NULL OR v3 = COALESCE($2,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE($3,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE($4,v5))",
             pt,
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1],
+            field_values[2]
         ))
     } else if field_index == 2 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v2 is NULL OR v2 = $2) AND
-                    (v3 is NULL OR v3 = $3) AND
-                    (v4 is NULL OR v4 = $4) AND
-                    (v5 is NULL OR v5 = $5)",
+                    (v2 is NULL OR v2 = COALESCE($2,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE($3,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE($4,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE($5,v5))",
             pt,
+            field_values[0],
+            field_values[1],
             field_values[2],
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[3]
         ))
     } else if field_index == 1 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v1 is NULL OR v1 = $2) AND
-                    (v2 is NULL OR v2 = $3) AND
-                    (v3 is NULL OR v3 = $4) AND
-                    (v4 is NULL OR v4 = $5) AND
-                    (v5 is NULL OR v5 = $6)",
+                    (v1 is NULL OR v1 = COALESCE($2,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE($3,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE($4,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE($5,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE($6,v5))",
             pt,
+            field_values[0],
             field_values[1],
             field_values[2],
             field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[4]
         ))
     } else {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v0 is NULL OR v0 = $2) AND
-                    (v1 is NULL OR v1 = $3) AND
-                    (v2 is NULL OR v2 = $4) AND
-                    (v3 is NULL OR v3 = $5) AND
-                    (v4 is NULL OR v4 = $6) AND
-                    (v5 is NULL OR v5 = $7)",
+                    (v0 is NULL OR v0 = COALESCE($2,v0)) AND
+                    (v1 is NULL OR v1 = COALESCE($3,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE($4,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE($5,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE($6,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE($7,v5))",
             pt,
             field_values[0],
             field_values[1],
@@ -408,77 +408,77 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values);
+    let field_values = normalize_casbin_rule_option(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = $1 AND
-                    (v5 is NULL OR v5 = $2)",
+                    (v5 is NULL OR v5 = COALESCE(?2,v5))",
             pt,
-            field_values[5]
+            field_values[0]
         ))
     } else if field_index == 4 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
-                    (v4 is NULL OR v4 = ?2) AND
-                    (v5 is NULL OR v5 = ?3)",
+                    (v4 is NULL OR v4 = COALESCE(?2,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?3,v5))",
             pt,
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1]
         ))
     } else if field_index == 3 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
-                    (v3 is NULL OR v3 = ?2) AND
-                    (v4 is NULL OR v4 = ?3) AND
-                    (v5 is NULL OR v5 = ?4)",
+                    (v3 is NULL OR v3 = COALESCE(?2,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?3,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?4,v5))",
             pt,
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1],
+            field_values[2]
         ))
     } else if field_index == 2 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
-                    (v2 is NULL OR v2 = ?2) AND
-                    (v3 is NULL OR v3 = ?3) AND
-                    (v4 is NULL OR v4 = ?4) AND
-                    (v5 is NULL OR v5 = ?5)",
+                    (v2 is NULL OR v2 = COALESCE(?2,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?3,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?4,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?5,v5))",
             pt,
+            field_values[0],
+            field_values[1],
             field_values[2],
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[3]
         ))
     } else if field_index == 1 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
-                    (v1 is NULL OR v1 = ?2) AND
-                    (v2 is NULL OR v2 = ?3) AND
-                    (v3 is NULL OR v3 = ?4) AND
-                    (v4 is NULL OR v4 = ?5) AND
-                    (v5 is NULL OR v5 = ?6)",
+                    (v1 is NULL OR v1 = COALESCE(?2,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE(?3,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?4,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?5,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?6,v5))",
             pt,
+            field_values[0],
             field_values[1],
             field_values[2],
             field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[4]
         ))
     } else {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ?1 AND
-                    (v0 is NULL OR v0 = ?2) AND
-                    (v1 is NULL OR v1 = ?3) AND
-                    (v2 is NULL OR v2 = ?4) AND
-                    (v3 is NULL OR v3 = ?5) AND
-                    (v4 is NULL OR v4 = ?6) AND
-                    (v5 is NULL OR v5 = ?7)",
+                    (v0 is NULL OR v0 = COALESCE(?2,v0)) AND
+                    (v1 is NULL OR v1 = COALESCE(?3,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE(?4,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?5,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?6,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?7,v5))",
             pt,
             field_values[0],
             field_values[1],
@@ -503,77 +503,77 @@ pub async fn remove_filtered_policy(
     field_index: usize,
     field_values: Vec<String>,
 ) -> Result<bool> {
-    let field_values = normalize_casbin_rule(field_values);
+    let field_values = normalize_casbin_rule_option(field_values);
     let boxed_query = if field_index == 5 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt,
-            field_values[5]
+            field_values[0]
         ))
     } else if field_index == 4 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v4 is NULL OR v4 = ?) AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt.to_string(),
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1]
         ))
     } else if field_index == 3 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v3 is NULL OR v3 = ?) AND
-                    (v4 is NULL OR v4 = ?) AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt,
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[0],
+            field_values[1],
+            field_values[2]
         ))
     } else if field_index == 2 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v2 is NULL OR v2 = ?) AND
-                    (v3 is NULL OR v3 = ?) AND
-                    (v4 is NULL OR v4 = ?) AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt,
+            field_values[0],
+            field_values[1],
             field_values[2],
-            field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[3]
         ))
     } else if field_index == 1 {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v1 is NULL OR v1 = ?) AND
-                    (v2 is NULL OR v2 = ?) AND
-                    (v3 is NULL OR v3 = ?) AND
-                    (v4 is NULL OR v4 = ?) AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v1 is NULL OR v1 = COALESCE(?,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt,
+            field_values[0],
             field_values[1],
             field_values[2],
             field_values[3],
-            field_values[4],
-            field_values[5]
+            field_values[4]
         ))
     } else {
         Box::new(sqlx::query!(
             "DELETE FROM casbin_rule WHERE
                     ptype = ? AND
-                    (v0 is NULL OR v0 = ?) AND
-                    (v1 is NULL OR v1 = ?) AND
-                    (v2 is NULL OR v2 = ?) AND
-                    (v3 is NULL OR v3 = ?) AND
-                    (v4 is NULL OR v4 = ?) AND
-                    (v5 is NULL OR v5 = ?)",
+                    (v0 is NULL OR v0 = COALESCE(?,v0)) AND
+                    (v1 is NULL OR v1 = COALESCE(?,v1)) AND
+                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND
+                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND
+                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND
+                    (v5 is NULL OR v5 = COALESCE(?,v5))",
             pt,
             field_values[0],
             field_values[1],
@@ -1070,4 +1070,13 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
 fn normalize_casbin_rule(mut rule: Vec<String>) -> Vec<String> {
     rule.resize(6, String::new());
     rule
+}
+
+fn normalize_casbin_rule_option(rule: Vec<String>) -> Vec<Option<String>> {
+    let mut rule_with_option = rule
+        .iter()
+        .map(|x| Some(x.clone()))
+        .collect::<Vec<Option<String>>>();
+    rule_with_option.resize(6, None);
+    rule_with_option
 }
