@@ -45,6 +45,7 @@ jobs:
         if: matrix.os == 'macOS-latest'
         run: |
           brew update
+          brew upgrade postgresql
           brew install mariadb@10.5 sqlite
           pg_ctl -D /usr/local/var/postgres start
           sleep 3
