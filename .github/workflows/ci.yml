@@ -48,7 +48,7 @@ jobs:
           brew upgrade
           brew services start postgresql
           brew install mariadb@10.5 sqlite
-          pg_ctl -D /usr/local/var/postgres start
+          # pg_ctl -D /usr/local/var/postgres start
           sleep 3
           createuser casbin_rs
           createdb casbin
