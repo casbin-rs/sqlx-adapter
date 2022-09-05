@@ -50,4 +50,4 @@ lto           = true
 opt-level     = 3
 
 [profile.dev]
-split-debuginfo = "unpacked"
+split-debuginfo = "packed"
