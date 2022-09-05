@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, macOS-latest ]
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
         rust: [ stable, beta, nightly ]
 
     steps:
@@ -27,19 +27,20 @@ jobs:
           components: rustfmt, clippy
           override: true
 
-      # - name: Setup PostgreSQL & MySQL & SQLite (for ubuntu)
-      #   if: matrix.os == 'ubuntu-latest'
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y libpq-dev postgresql libmysqlclient-dev mysql-client libsqlite3-dev sqlite3
-      #     echo "host    all             all             127.0.0.1/32            md5" > sudo tee -a /etc/postgresql/10/main/pg_hba.conf
-      #     sudo service postgresql restart && sleep 3
-      #     sudo -u postgres createuser casbin_rs
-      #     sudo -u postgres createdb casbin
-      #     sudo -u postgres psql -c "alter user casbin_rs with encrypted password 'casbin_rs'; grant all privileges on database casbin to casbin_rs;"
-      #     sudo service postgresql restart && sleep 3
-      #     sudo systemctl start mysql.service
-      #     mysql -e "create user 'casbin_rs'@'localhost' identified by 'casbin_rs'; create database casbin; grant all on \`casbin\`.* to 'casbin_rs'@'localhost';" -uroot -proot
+      - name: Setup PostgreSQL & MySQL & SQLite (for ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install -y libpq-dev postgresql libmysqlclient-dev mysql-client libsqlite3-dev sqlite3
+          echo "host    all             all             127.0.0.1/32            md5" > sudo tee -a /etc/postgresql/10/main/pg_hba.conf
+          sudo service postgresql restart && sleep 3
+          sudo -u postgres createuser casbin_rs
+          sudo -u postgres createdb casbin
+          sudo -u postgres psql -c "alter user casbin_rs with encrypted password 'casbin_rs'; grant all privileges on database casbin to casbin_rs;"
+          sudo service postgresql restart && sleep 3
+          sudo systemctl start mysql.service
+          mysql -e "create user 'casbin_rs'@'localhost' identified by 'casbin_rs'; create database casbin; grant all on \`casbin\`.* to 'casbin_rs'@'localhost';" -uroot -proot
 
       - name: Setup PostgreSQL & MySQL & SQLite (for macOS)
         if: matrix.os == 'macOS-latest'
