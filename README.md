@@ -27,7 +27,7 @@ ALTER TABLE casbin_rules RENAME TO casbin_rule;
 Add it to `Cargo.toml`
 
 ```rust
-sqlx-adapter = { version = "0.4.2, features = ["postgres"] }
+sqlx-adapter = { version = "0.4.2", features = ["postgres"] }
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
