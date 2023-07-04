@@ -286,10 +286,6 @@ mod tests {
         any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
         tokio::test(flavor = "multi_thread")
     )]
-    #[cfg_attr(
-        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
-        actix_rt::test
-    )]
     async fn test_create() {
         use casbin::prelude::*;
 
@@ -331,10 +327,6 @@ mod tests {
     #[cfg_attr(
         any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
         tokio::test(flavor = "multi_thread")
-    )]
-    #[cfg_attr(
-        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
-        actix_rt::test
     )]
     async fn test_create_with_pool() {
         use casbin::prelude::*;
@@ -386,10 +378,6 @@ mod tests {
     #[cfg_attr(
         any(feature = "runtime-tokio-native-tls", feature = "runtime-tokio-rustls"),
         tokio::test(flavor = "multi_thread")
-    )]
-    #[cfg_attr(
-        any(feature = "runtime-actix-native-tls", feature = "runtime-actix-rustls"),
-        actix_rt::test
     )]
     async fn test_adapter() {
         use casbin::prelude::*;

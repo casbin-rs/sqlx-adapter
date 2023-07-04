@@ -1,0 +1,62 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM casbin_rule",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "ptype",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "v0",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "v1",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "v2",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "v3",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "v4",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "v5",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3022cb733970ae5836ab3891367b209a7e1f0974242ecd0f55e5b0098152bad5"
+}
