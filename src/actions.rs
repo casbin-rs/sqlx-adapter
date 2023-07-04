@@ -194,7 +194,7 @@ pub async fn remove_policies(
             rule[4],
             rule[5]
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if PgQueryResult::rows_affected(&n) == 1 {
@@ -241,7 +241,7 @@ pub async fn remove_policies(
             rule[4],
             rule[5]
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if SqliteQueryResult::rows_affected(&n) == 1 {
@@ -288,7 +288,7 @@ pub async fn remove_policies(
             rule[4],
             rule[5]
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if MySqlQueryResult::rows_affected(&n) == 1 {
@@ -717,7 +717,7 @@ pub(crate) async fn save_policy(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
@@ -732,7 +732,7 @@ pub(crate) async fn save_policy(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if PgQueryResult::rows_affected(&n) == 1 {
@@ -760,7 +760,7 @@ pub(crate) async fn save_policy(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
@@ -775,7 +775,7 @@ pub(crate) async fn save_policy(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if SqliteQueryResult::rows_affected(&n) == 1 {
@@ -803,7 +803,7 @@ pub(crate) async fn save_policy<'a>(
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     for rule in rules {
@@ -818,7 +818,7 @@ pub(crate) async fn save_policy<'a>(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if MySqlQueryResult::rows_affected(&n) == 1 {
@@ -920,7 +920,7 @@ pub(crate) async fn add_policies(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if PgQueryResult::rows_affected(&n) == 1 {
@@ -959,7 +959,7 @@ pub(crate) async fn add_policies(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if SqliteQueryResult::rows_affected(&n) == 1 {
@@ -998,7 +998,7 @@ pub(crate) async fn add_policies(
             rule.v4,
             rule.v5
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .and_then(|n| {
             if MySqlQueryResult::rows_affected(&n) == 1 {
@@ -1023,7 +1023,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     transaction
@@ -1040,7 +1040,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     transaction
@@ -1057,7 +1057,7 @@ pub(crate) async fn clear_policy(conn: &ConnectionPool) -> Result<()> {
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     sqlx::query!("DELETE FROM casbin_rule")
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await
         .map_err(|err| CasbinError::from(AdapterError(Box::new(Error::SqlxError(err)))))?;
     transaction
