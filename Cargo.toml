@@ -18,12 +18,12 @@ async-std = { version = "1.9.0", default-features = false, optional = true }
 actix-rt = { version = "2.2.0", default-features = false, optional = true }
 
 [features]
-default = ["postgres", "runtime-tokio-native-tls", "offline"]
+default = ["postgres", "offline"]
 
 #databases
-postgres = ["sqlx/postgres"]
-mysql = ["sqlx/mysql"]
-sqlite = ["sqlx/sqlite"]
+postgres = ["sqlx/postgres", "runtime-tokio-native-tls"]
+mysql = ["sqlx/mysql", "runtime-tokio-native-tls"]
+sqlite = ["sqlx/sqlite", "runtime-tokio-native-tls"]
 
 # async runtime
 # async-std
