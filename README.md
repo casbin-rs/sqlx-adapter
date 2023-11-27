@@ -26,8 +26,10 @@ ALTER TABLE casbin_rules RENAME TO casbin_rule;
 
 Add it to `Cargo.toml`
 
-```rust
-sqlx-adapter = { version = "0.4.2, features = ["postgres"] }
+```toml
+sqlx-adapter = { version = "0.4.2", default-features = false, features = ["postgres", "runtime-tokio-native-tls"]}
+# sqlx-adapter = { version = "0.4.2, default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
+# sqlx-adapter = { version = "0.4.2, default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
