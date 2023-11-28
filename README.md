@@ -10,8 +10,8 @@ Sqlx Adapter is the [Sqlx](https://github.com/launchbadge/sqlx) adapter for [Cas
 
 Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported databases are:
 
-- [Mysql](https://www.mysql.com/)
-- [Postgres](https://github.com/lib/pq)
+- [MySQL](https://www.mysql.com/)
+- [PostgreSQL](https://github.com/lib/pq)
 - [SQLite](https://www.sqlite.org)
 
 ## Notice
@@ -24,10 +24,26 @@ ALTER TABLE casbin_rules RENAME TO casbin_rule;
 
 ## Install
 
-Add it to `Cargo.toml`
+Add the following to `Cargo.toml`:
 
-```rust
-sqlx-adapter = { version = "0.4.2, features = ["postgres"] }
+For MySQL:
+
+```toml
+sqlx-adapter = { version = "0.4.2, default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
+tokio = { version = "1.1.1", features = ["macros"] }
+```
+
+For PostgreSQL:
+
+```toml
+sqlx-adapter = { version = "0.4.2", default-features = false, features = ["postgres", "runtime-tokio-native-tls"]}
+tokio = { version = "1.1.1", features = ["macros"] }
+```
+
+For SQLite:
+
+```toml
+sqlx-adapter = { version = "0.4.2, default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
