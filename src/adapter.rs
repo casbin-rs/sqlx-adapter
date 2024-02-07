@@ -143,7 +143,7 @@ impl<'a> SqlxAdapter {
 
 #[async_trait]
 impl Adapter for SqlxAdapter {
-    async fn load_policy(&self, m: &mut dyn Model) -> Result<()> {
+    async fn load_policy(&mut self, m: &mut dyn Model) -> Result<()> {
         let rules = adapter::load_policy(&self.pool).await?;
 
         for casbin_rule in &rules {
