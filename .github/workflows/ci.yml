@@ -49,6 +49,7 @@ jobs:
           brew uninstall --ignore-dependencies node
           brew install node@18
           brew link --overwrite node@18
+          brew link --overwrite python@3.11
           brew upgrade
           brew services start postgresql
           brew install mariadb@10.5 sqlite
