@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM casbin_rule",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "24876462291b90324dfe3682e9f36247a328db780a48da47c9402e1d3ebd80c9"
+}

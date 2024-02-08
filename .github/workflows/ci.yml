@@ -45,6 +45,10 @@ jobs:
       - name: Setup PostgreSQL & MySQL & SQLite (for macOS)
         if: matrix.os == 'macOS-latest'
         run: |
+          # Unlink and re-link to prevent errors when github mac runner images
+          # https://github.com/actions/setup-python/issues/577
+          brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done
+
           brew update
           brew uninstall --ignore-dependencies node
           brew install node@18
@@ -173,23 +177,6 @@ jobs:
           command: test
           args: --no-default-features --features postgres,runtime-tokio-rustls
 
-      # actix
-      - name: Cargo Test For PostgreSQL,runtime-actix-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-actix-native-tls
-
-      - name: Cargo Test For PostgreSQL,runtime-actix-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-actix-rustls
-
       # MySQL
       # async-std
       - name: Cargo Test For MySQL,runtime-async-std-native-tls
@@ -225,23 +212,6 @@ jobs:
           command: test
           args: --no-default-features --features mysql,runtime-tokio-rustls
 
-      # actix
-      - name: Cargo Test For MySQL,runtime-actix-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-actix-native-tls
-
-      - name: Cargo Test For MySQL,runtime-actix-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-actix-rustls
-
       #SQLite
       #async-std
       - name: Cargo Test For SQLite,runtime-async-std-native-tls
@@ -276,23 +246,6 @@ jobs:
         with:
           command: test
           args: --no-default-features --features sqlite,runtime-tokio-rustls
-
-      # actix
-      - name: Cargo Test For SQLite,runtime-actix-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-actix-native-tls
-
-      - name: Cargo Test For SQLite,runtime-actix-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-actix-rustls
 
       - name: Cargo Clippy
         uses: actions-rs/cargo@v1
