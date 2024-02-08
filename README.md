@@ -15,6 +15,7 @@ Based on [Sqlx](https://github.com/launchbadge/sqlx), The current supported data
 - [SQLite](https://www.sqlite.org)
 
 ## Notice
+
 In order to unify the database table name in Casbin ecosystem, we decide to use `casbin_rule` instead of `casbin_rules` from version `0.4.0`. If you are using old version `sqlx-adapter` in your production environment, please use following command and update `sqlx-adapter` version:
 
 ````SQL
@@ -29,7 +30,7 @@ Add the following to `Cargo.toml`:
 For MySQL:
 
 ```toml
-sqlx-adapter = { version = "0.4.2, default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
+sqlx-adapter = { version = "0.4.2", default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
@@ -43,7 +44,7 @@ tokio = { version = "1.1.1", features = ["macros"] }
 For SQLite:
 
 ```toml
-sqlx-adapter = { version = "0.4.2, default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
+sqlx-adapter = { version = "0.4.2", default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
