@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/sqlx-adapter.svg)](https://crates.io/crates/sqlx-adapter)
 [![Docs](https://docs.rs/sqlx-adapter/badge.svg)](https://docs.rs/sqlx-adapter)
-[![CI](https://github.com/casbin-rs/sqlx-adapter/workflows/CI/badge.svg)](https://github.com/casbin-rs/sqlx-adapter/actions)
+[![CI](https://github.com/casbin-rs/sqlx-adapter/actions/workflows/ci.yml/badge.svg)](https://github.com/casbin-rs/sqlx-adapter/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/casbin-rs/sqlx-adapter/branch/master/graph/badge.svg)](https://codecov.io/gh/casbin-rs/sqlx-adapter)
 
 
