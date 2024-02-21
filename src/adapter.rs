@@ -251,7 +251,7 @@ impl Adapter for SqlxAdapter {
         field_index: usize,
         field_values: Vec<String>,
     ) -> Result<bool> {
-        if field_index <= 5 && !field_values.is_empty() && field_values.len() > field_index {
+        if field_index <= 5 && !field_values.is_empty() && field_values.len() + field_index <= 6 {
             adapter::remove_filtered_policy(&self.pool, pt, field_index, field_values).await
         } else {
             Ok(false)
