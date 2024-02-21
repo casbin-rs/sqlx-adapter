@@ -251,7 +251,7 @@ impl Adapter for SqlxAdapter {
         field_index: usize,
         field_values: Vec<String>,
     ) -> Result<bool> {
-        if field_index <= 5 && !field_values.is_empty() && field_values.len() > field_index {
+        if field_index <= 5 && !field_values.is_empty() && field_values.len() + field_index <= 6 {
             adapter::remove_filtered_policy(&self.pool, pt, field_index, field_values).await
         } else {
             Ok(false)
@@ -565,6 +565,56 @@ mod tests {
             .await
             .unwrap());
         assert_eq!(vec![String::new(); 0], e.get_roles_for_user("carol", None));
+
+        // GitHub issue: https://github.com/casbin-rs/sqlx-adapter/pull/90
+        // add policies:
+        // p, alice_rfp, book_rfp, read_rfp
+        // p, bob_rfp, book_rfp, read_rfp
+        // p, bob_rfp, book_rfp, write_rfp
+        // p, alice_rfp, pen_rfp, get_rfp
+        // p, bob_rfp, pen_rfp, get_rfp
+        // p, alice_rfp, pencil_rfp, get_rfp
+        assert!(adapter
+            .add_policy("", "p", to_owned(vec!["alice_rfp", "book_rfp", "read_rfp"]),)
+            .await
+            .is_ok());
+        assert!(adapter
+            .add_policy("", "p", to_owned(vec!["bob_rfp", "book_rfp", "read_rfp"]),)
+            .await
+            .is_ok());
+        assert!(adapter
+            .add_policy("", "p", to_owned(vec!["bob_rfp", "book_rfp", "write_rfp"]),)
+            .await
+            .is_ok());
+        assert!(adapter
+            .add_policy("", "p", to_owned(vec!["alice_rfp", "pen_rfp", "get_rfp"]),)
+            .await
+            .is_ok());
+        assert!(adapter
+            .add_policy("", "p", to_owned(vec!["bob_rfp", "pen_rfp", "get_rfp"]),)
+            .await
+            .is_ok());
+        assert!(adapter
+            .add_policy(
+                "",
+                "p",
+                to_owned(vec!["alice_rfp", "pencil_rfp", "get_rfp"]),
+            )
+            .await
+            .is_ok());
+
+        // should remove (return true) all policies where "book_rfp" is in the second position
+        assert!(adapter
+            .remove_filtered_policy("", "p", 1, to_owned(vec!["book_rfp"]),)
+            .await
+            .unwrap());
+
+        // should remove (return true) all policies which match "alice_rfp" on first position
+        // and "get_rfp" on third position
+        assert!(adapter
+            .remove_filtered_policy("", "p", 0, to_owned(vec!["alice_rfp", "", "get_rfp"]),)
+            .await
+            .unwrap());
 
         // shadow the previous enforcer
         let mut e = Enforcer::new(
