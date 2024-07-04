@@ -29,6 +29,7 @@ sqlite = ["sqlx/sqlite"]
 runtime-async-std-native-tls = ["casbin/runtime-async-std", "sqlx/runtime-async-std-native-tls"]
 runtime-async-std-rustls = ["casbin/runtime-async-std", "sqlx/runtime-async-std-rustls"]
 # tokio
+runtime-tokio = ["casbin/runtime-tokio", "sqlx/runtime-tokio"]
 runtime-tokio-native-tls = ["casbin/runtime-tokio", "sqlx/runtime-tokio-native-tls"]
 runtime-tokio-rustls = ["casbin/runtime-tokio", "sqlx/runtime-tokio-rustls"]
 
