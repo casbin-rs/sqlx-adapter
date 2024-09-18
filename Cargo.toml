@@ -12,7 +12,7 @@ readme= "README.md"
 casbin = { version = "2.1.0", default-features = false }
 sqlx = { version = "0.7", default-features = false, features = [ "macros" ] }
 async-trait = "0.1.51"
-dotenv = { version = "0.15.0", default-features = false }
+dotenvy = { version = "0.15.0", default-features = false }
 tokio = { version = "1.10.0", default-features = false, optional = true }
 async-std = { version = "1.9.0", default-features = false, optional = true }
 
