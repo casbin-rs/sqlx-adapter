@@ -57,9 +57,10 @@ jobs:
           createuser casbin_rs
           createdb casbin
           psql postgres -c "alter user casbin_rs with encrypted password 'casbin_rs'; grant all privileges on database casbin to casbin_rs;"
-          echo "/usr/local/opt/mariadb@10.5/bin" >> $GITHUB_PATH
-          /usr/local/opt/mariadb@10.5/bin/mysql_install_db
-          /usr/local/opt/mariadb@10.5/bin/mysql.server start
+          #echo "/usr/local/opt/mariadb@10.5/bin" >> $GITHUB_PATH
+          #/usr/local/opt/mariadb@10.5/bin/mysql_install_db
+          #/usr/local/opt/mariadb@10.5/bin/mysql.server start
+          brew services start mariadb
           sleep 3
           /usr/local/opt/mariadb@10.5/bin/mysql -e "create user 'casbin_rs'@'localhost' identified by 'casbin_rs'; create database casbin; grant all on \`casbin\`.* to 'casbin_rs'@'localhost';" -urunner
           echo "MYSQLCLIENT_LIB_DIR=/usr/local/opt/mariadb@10.5/lib" >> $GITHUB_ENV
