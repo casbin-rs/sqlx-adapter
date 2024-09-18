@@ -50,7 +50,6 @@ jobs:
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done
 
           brew update
-          brew upgrade
           brew services start postgresql
           brew install mariadb@10.5 sqlite
           # pg_ctl -D /usr/local/var/postgres start
