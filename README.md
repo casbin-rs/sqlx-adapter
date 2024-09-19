@@ -29,21 +29,21 @@ Add the following to `Cargo.toml`:
 For MySQL:
 
 ```toml
-sqlx-adapter = { version = "1.3.0", default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
+sqlx-adapter = { version = "1.4.0", default-features = false, features = ["mysql", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
 For PostgreSQL:
 
 ```toml
-sqlx-adapter = { version = "1.3.0", default-features = false, features = ["postgres", "runtime-tokio-native-tls"]}
+sqlx-adapter = { version = "1.4.0", default-features = false, features = ["postgres", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
 For SQLite:
 
 ```toml
-sqlx-adapter = { version = "1.3.0", default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
+sqlx-adapter = { version = "1.4.0", default-features = false, features = ["sqlite", "runtime-tokio-native-tls"]}
 tokio = { version = "1.1.1", features = ["macros"] }
 ```
 
