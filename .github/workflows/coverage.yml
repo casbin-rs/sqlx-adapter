@@ -51,13 +51,17 @@ jobs:
             CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             );"
 
+      - name: Install cargo-tarpaulin
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-tarpaulin
+
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
         env:
           DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          version: '0.22.0'
-          args: --avoid-cfg-tarpaulin --out Xml
+        run: |
+          cargo tarpaulin --avoid-cfg-tarpaulin --out Xml
+
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v1
