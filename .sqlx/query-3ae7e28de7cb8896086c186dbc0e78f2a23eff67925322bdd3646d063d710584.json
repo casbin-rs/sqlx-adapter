@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM casbin_rule",
+  "query": "SELECT id, ptype, v0, v1, v2, v3, v4, v5 FROM casbin_rule",
   "describe": {
     "columns": [
       {
@@ -58,5 +58,5 @@
       false
     ]
   },
-  "hash": "3022cb733970ae5836ab3891367b209a7e1f0974242ecd0f55e5b0098152bad5"
+  "hash": "3ae7e28de7cb8896086c186dbc0e78f2a23eff67925322bdd3646d063d710584"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * from  casbin_rule WHERE (\n            ptype LIKE 'g%' AND v0 LIKE $1 AND v1 LIKE $2 AND v2 LIKE $3 AND v3 LIKE $4 AND v4 LIKE $5 AND v5 LIKE $6 )\n        OR (\n            ptype LIKE 'p%' AND v0 LIKE $7 AND v1 LIKE $8 AND v2 LIKE $9 AND v3 LIKE $10 AND v4 LIKE $11 AND v5 LIKE $12 );\n            ",
+  "query": "SELECT id, ptype, v0, v1, v2, v3, v4, v5 from  casbin_rule WHERE (\n            ptype LIKE 'g%' AND v0 LIKE $1 AND v1 LIKE $2 AND v2 LIKE $3 AND v3 LIKE $4 AND v4 LIKE $5 AND v5 LIKE $6 )\n        OR (\n            ptype LIKE 'p%' AND v0 LIKE $7 AND v1 LIKE $8 AND v2 LIKE $9 AND v3 LIKE $10 AND v4 LIKE $11 AND v5 LIKE $12 );\n            ",
   "describe": {
     "columns": [
       {
@@ -71,5 +71,5 @@
       false
     ]
   },
-  "hash": "fb7ce69e70b345d2cf0ca017523c1b90b67b053add3d4cffb8d579bfc8f08345"
+  "hash": "530d3f59ba6d986d3354242ff25faae78671d69c8935d2a2d57c0f9d1e91e832"
 }
