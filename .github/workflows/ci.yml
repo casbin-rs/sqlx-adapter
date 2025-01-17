@@ -38,6 +38,9 @@ jobs:
           sudo -u postgres createuser casbin_rs
           sudo -u postgres createdb casbin
           sudo -u postgres psql -c "alter user casbin_rs with encrypted password 'casbin_rs'; grant all privileges on database casbin to casbin_rs;"
+          sudo -u postgres psql -c "GRANT USAGE, CREATE ON SCHEMA public TO casbin_rs;"
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE casbin TO casbin_rs;"
+          sudo -u postgres psql -c "ALTER DATABASE casbin OWNER TO casbin_rs;"
           sudo service postgresql restart && sleep 3
           sudo systemctl start mysql.service
           mysql -e "create user 'casbin_rs'@'localhost' identified by 'casbin_rs'; create database casbin; grant all on \`casbin\`.* to 'casbin_rs'@'localhost';" -uroot -proot
@@ -57,6 +60,9 @@ jobs:
           createuser casbin_rs
           createdb casbin
           psql postgres -c "alter user casbin_rs with encrypted password 'casbin_rs'; grant all privileges on database casbin to casbin_rs;"
+          psql postgres -c "GRANT USAGE, CREATE ON SCHEMA public TO casbin_rs;"
+          psql postgres -c "GRANT ALL ON DATABASE casbin TO casbin_rs;"
+          psql postgres -c "ALTER DATABASE casbin OWNER TO casbin_rs;"
           #echo "/usr/local/opt/mariadb@10.5/bin" >> $GITHUB_PATH
           #/usr/local/opt/mariadb@10.5/bin/mysql_install_db
           #/usr/local/opt/mariadb@10.5/bin/mysql.server start
