@@ -631,7 +631,7 @@ pub(crate) async fn load_policy(conn: &ConnectionPool) -> Result<Vec<CasbinRule>
 }
 
 #[cfg(feature = "postgres")]
-pub(crate) async fn load_filtered_policy<'a>(
+pub(crate) async fn load_filtered_policy(
     conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
@@ -654,7 +654,7 @@ pub(crate) async fn load_filtered_policy<'a>(
 }
 
 #[cfg(feature = "sqlite")]
-pub(crate) async fn load_filtered_policy<'a>(
+pub(crate) async fn load_filtered_policy(
     conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
@@ -677,7 +677,7 @@ pub(crate) async fn load_filtered_policy<'a>(
 }
 
 #[cfg(feature = "mysql")]
-pub(crate) async fn load_filtered_policy<'a>(
+pub(crate) async fn load_filtered_policy(
     conn: &ConnectionPool,
     filter: &Filter<'_>,
 ) -> Result<Vec<CasbinRule>> {
