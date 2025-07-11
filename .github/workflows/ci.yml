@@ -20,12 +20,19 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
-          override: true
+          
+      - name: Cargo Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Cargo Fmt Check
+        run: cargo fmt --all -- --check
+
+      - name: Cargo Build
+        run: cargo build
 
       - name: Setup PostgreSQL & MySQL & SQLite (for ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -48,12 +55,8 @@ jobs:
       - name: Setup PostgreSQL & MySQL & SQLite (for macOS)
         if: matrix.os == 'macOS-latest'
         run: |
-          # Unlink and re-link to prevent errors when github mac runner images
-          # https://github.com/actions/setup-python/issues/577
-          brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done
-
           brew update
-          brew install postgresql mariadb sqlite
+          brew install postgresql mariadb
           brew services start postgresql
           # pg_ctl -D /usr/local/var/postgres start
           sleep 3
@@ -137,127 +140,32 @@ jobs:
             v3 VARCHAR(128) NOT NULL,
             v4 VARCHAR(128) NOT NULL,
             v5 VARCHAR(128) NOT NULL,
-            CONSTRAINT unique_key_diesel_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
+            CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)
             );"
 
-      - name: Cargo Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-
-      # PostgreSQL tests
-      # async-std
-      - name: Cargo Test For PostgreSQL,runtime-async-std-native-tls
-        uses: actions-rs/cargo@v1
+      - name: Cargo Test For PostgreSQL
         env:
           DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-async-std-native-tls
+        run: |
+          cargo test --no-default-features --features postgres,runtime-async-std-native-tls
+          cargo test --no-default-features --features postgres,runtime-async-std-rustls
+          cargo test --no-default-features --features postgres,runtime-tokio-native-tls
+          cargo test --no-default-features --features postgres,runtime-tokio-rustls
 
-      - name: Cargo Test For PostgreSQL,runtime-async-std-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-async-std-rustls
-
-      # tokio
-      - name: Cargo Test For PostgreSQL,runtime-tokio-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-tokio-native-tls
-
-      - name: Cargo Test For PostgreSQL,runtime-tokio-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: postgres://casbin_rs:casbin_rs@localhost:5432/casbin
-        with:
-          command: test
-          args: --no-default-features --features postgres,runtime-tokio-rustls
-
-      # MySQL
-      # async-std
-      - name: Cargo Test For MySQL,runtime-async-std-native-tls
-        uses: actions-rs/cargo@v1
+      - name: Cargo Test For MySQL
         env:
           DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-async-std-native-tls
+        run: |
+          cargo test --no-default-features --features mysql,runtime-async-std-native-tls
+          cargo test --no-default-features --features mysql,runtime-async-std-rustls
+          cargo test --no-default-features --features mysql,runtime-tokio-native-tls
+          cargo test --no-default-features --features mysql,runtime-tokio-rustls
 
-      - name: Cargo Test For MySQL,runtime-async-std-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-async-std-rustls
-
-      # tokio
-      - name: Cargo Test For MySQL,runtime-tokio-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-tokio-native-tls
-
-      - name: Cargo Test For MySQL,runtime-tokio-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: mysql://casbin_rs:casbin_rs@localhost:3306/casbin
-        with:
-          command: test
-          args: --no-default-features --features mysql,runtime-tokio-rustls
-
-      #SQLite
-      #async-std
-      - name: Cargo Test For SQLite,runtime-async-std-native-tls
-        uses: actions-rs/cargo@v1
+      - name: Cargo Test For SQLite
         env:
           DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-async-std-native-tls
-
-      - name: Cargo Test For SQLite,runtime-async-std-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-async-std-rustls
-
-      # tokio
-      - name: Cargo Test For SQLite,runtime-tokio-native-tls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-tokio-native-tls
-
-      - name: Cargo Test For SQLite,runtime-tokio-rustls
-        uses: actions-rs/cargo@v1
-        env:
-          DATABASE_URL: sqlite:casbin.db
-        with:
-          command: test
-          args: --no-default-features --features sqlite,runtime-tokio-rustls
-
-      - name: Cargo Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-
-      - name: Cargo Fmt Check
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+        run: |
+          cargo test --no-default-features --features sqlite,runtime-async-std-native-tls
+          cargo test --no-default-features --features sqlite,runtime-async-std-rustls
+          cargo test --no-default-features --features sqlite,runtime-tokio-native-tls
+          cargo test --no-default-features --features sqlite,runtime-tokio-rustls
